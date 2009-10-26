@@ -112,7 +112,19 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 	[super finalize];
 }
 
-- (void) setCookieMappingInDictionary: (NSMutableDictionary*) _cookieToButtonMapping	{	
+- (void) setCookieMappingInDictionary: (NSMutableDictionary*) _cookieToButtonMapping	{
+
+	// check if we are using the rb device driver instead of the one from Apple
+	io_object_t foundRemoteDevice = [[self class] findRemoteDevice];
+	BOOL leopardEmulation = NO;
+	if (foundRemoteDevice != 0) {
+		CFTypeRef leoEmuAttr;
+		if (leoEmuAttr = IORegistryEntryCreateCFProperty(foundRemoteDevice, CFSTR("RemoteBuddyEmulationV2"), kCFAllocatorDefault, 0)) {
+			leopardEmulation = CFEqual(leoEmuAttr, kCFBooleanTrue);			
+			CFRelease(leoEmuAttr);
+		}
+	}
+
 	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_4) {
 		// 10.4.x Tiger
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlus]		forKey:@"14_12_11_6_"];
@@ -126,7 +138,7 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu_Hold]	forKey:@"14_6_14_6_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"18_14_6_18_14_6_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]	forKey:@"19_"];			
-	} else if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_5) {
+	} else if ((floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_5) || (leopardEmulation)) {
 		// 10.5.x Leopard
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlus]		forKey:@"31_29_28_19_18_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMinus]		forKey:@"31_30_28_19_18_"];	
