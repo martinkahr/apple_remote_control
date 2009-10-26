@@ -118,8 +118,8 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 	io_object_t foundRemoteDevice = [[self class] findRemoteDevice];
 	BOOL leopardEmulation = NO;
 	if (foundRemoteDevice != 0) {
-		CFTypeRef leoEmuAttr;
-		if (leoEmuAttr = IORegistryEntryCreateCFProperty(foundRemoteDevice, CFSTR("RemoteBuddyEmulationV2"), kCFAllocatorDefault, 0)) {
+		CFTypeRef leoEmuAttr = IORegistryEntryCreateCFProperty(foundRemoteDevice, CFSTR("RemoteBuddyEmulationV2"), kCFAllocatorDefault, 0);
+		if (leoEmuAttr) {
 			leopardEmulation = CFEqual(leoEmuAttr, kCFBooleanTrue);			
 			CFRelease(leoEmuAttr);
 		}
