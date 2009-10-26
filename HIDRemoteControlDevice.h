@@ -34,9 +34,8 @@
 	Base class for HID based remote control devices
  */
 @interface HIDRemoteControlDevice : RemoteControl {
-	// See: http://developer.apple.com/documentation/Cocoa/Conceptual/GarbageCollection/Articles/gcCoreFoundation.html#//apple_ref/doc/uid/TP40006687-SW4
-	__strong IOHIDDeviceInterface** hidDeviceInterface;
-	__strong IOHIDQueueInterface**  queue;
+	IOHIDDeviceInterface** hidDeviceInterface;
+	IOHIDQueueInterface**  queue;
 	NSMutableArray*		   allCookies;
 	NSMutableDictionary*   cookieToButtonMapping;
 	
@@ -55,7 +54,7 @@
 - (BOOL) processesBacklog;
 - (void) setProcessesBacklog: (BOOL) value;
 
-// methods that should be overwritten by subclasses
+// methods that should be overridden by subclasses
 - (void) setCookieMappingInDictionary: (NSMutableDictionary*) cookieToButtonMapping;
 
 - (void) sendRemoteButtonEvent: (RemoteControlEventIdentifier) event pressedDown: (BOOL) pressedDown;

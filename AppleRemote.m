@@ -27,8 +27,6 @@
 
 #import "AppleRemote.h"
 
-#import <mach/mach.h>
-#import <mach/mach_error.h>
 #import <IOKit/IOKitLib.h>
 #import <IOKit/IOCFPlugIn.h>
 #import <IOKit/hid/IOHIDKeys.h>
@@ -36,8 +34,8 @@
 
 static void IOREInterestCallback(
 								 void *			refcon,
-								 io_service_t		service,
-								 natural_t		messageType,
+								 io_service_t	service,
+								 uint32_t		messageType,
 								 void *			messageArgument );
 
 
@@ -70,22 +68,25 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 		// is changing.
 		io_registry_entry_t root = IORegistryGetRootEntry( kIOMasterPortDefault );  
 		if (root != MACH_PORT_NULL) {
-			mach_port_t port = kIOMasterPortDefault;
-			IONotificationPortRef notifyPort = IONotificationPortCreate( port );
-			CFRunLoopSourceRef runLoopSource = IONotificationPortGetRunLoopSource(notifyPort);	
-			CFRunLoopRef gRunLoop = CFRunLoopGetCurrent();
-			CFRunLoopAddSource(gRunLoop, runLoopSource, kCFRunLoopDefaultMode);
-			
-			kern_return_t kr;
-			io_object_t		notification;
-			kr = IOServiceAddInterestNotification( notifyPort,
-												  IORegistryEntryFromPath( port, kIOServicePlane ":/"),
-												  kIOBusyInterest, 
-												  &IOREInterestCallback, self, &notification );
-			if (kr == KERN_SUCCESS) {
-			} else {				
-				NSLog(@"Error when installing EventSecureInput Notification");
+			IONotificationPortRef notifyPort = IONotificationPortCreate( kIOMasterPortDefault );
+			if (notifyPort) {
+				CFRunLoopSourceRef runLoopSource = IONotificationPortGetRunLoopSource(notifyPort);	
+				CFRunLoopRef gRunLoop = CFRunLoopGetCurrent();
+				CFRunLoopAddSource(gRunLoop, runLoopSource, kCFRunLoopDefaultMode);
+				
+				io_registry_entry_t entry = IORegistryEntryFromPath( kIOMasterPortDefault, kIOServicePlane ":/");
+				if (entry != MACH_PORT_NULL) {
+					kern_return_t kr;
+					kr = IOServiceAddInterestNotification(notifyPort,
+														  entry,
+														  kIOBusyInterest, 
+														  &IOREInterestCallback, self, &eventSecureInputNotification );
+					(void)kr;
+					IOObjectRelease(entry);
+				}
+				IONotificationPortDestroy(notifyPort);
 			}
+			IOObjectRelease(root);
 		}
 		
 		lastSecureEventInputState = [self retrieveSecureEventInputState];
@@ -94,19 +95,24 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 	return self;
 }
 
-- (void) setCookieMappingInDictionary: (NSMutableDictionary*) _cookieToButtonMapping	{
+- (void)dealloc
+{
+	IOObjectRelease (eventSecureInputNotification);
+	eventSecureInputNotification = MACH_PORT_NULL;
+	
+	[super dealloc];
+}
 
-	// check if we are using the rb device driver instead of the one from Apple
-	io_object_t foundRemoteDevice = [[self class] findRemoteDevice];
-	BOOL leopardEmulation = NO;
-	if (foundRemoteDevice != 0) {
-		CFTypeRef leoEmuAttr;
-		if (leoEmuAttr = IORegistryEntryCreateCFProperty(foundRemoteDevice, CFSTR("RemoteBuddyEmulationV2"), kCFAllocatorDefault, 0)) {
-			leopardEmulation = CFEqual(leoEmuAttr, kCFBooleanTrue);			
-			CFRelease(leoEmuAttr);
-		}
-	}
+- (void)finalize
+{
+	// Although IOObjectRelease is not documented as thread safe, I was assured at WWDC09 that it is.
+	IOObjectRelease (eventSecureInputNotification);
+	eventSecureInputNotification = MACH_PORT_NULL;
+	
+	[super finalize];
+}
 
+- (void) setCookieMappingInDictionary: (NSMutableDictionary*) _cookieToButtonMapping	{	
 	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_4) {
 		// 10.4.x Tiger
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlus]		forKey:@"14_12_11_6_"];
@@ -120,7 +126,7 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu_Hold]	forKey:@"14_6_14_6_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"18_14_6_18_14_6_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]	forKey:@"19_"];			
-	} else if ((floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_5) || (leopardEmulation)) {
+	} else if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_5) {
 		// 10.5.x Leopard
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlus]		forKey:@"31_29_28_19_18_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMinus]		forKey:@"31_30_28_19_18_"];	
@@ -179,6 +185,7 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 			}
 			CFRelease(arrayRef);
 		}
+		IOObjectRelease(root);
 	}
 	return returnValue;
 }
@@ -198,14 +205,16 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 
 static void IOREInterestCallback(void *			refcon,
 								 io_service_t	service,
-								 natural_t		messageType,
+								 uint32_t		messageType,
 								 void *			messageArgument )
 {	
 	(void)service;
 	(void)messageType;
 	(void)messageArgument;
 	
+	// With garbage collection, such a cast is dangerous because the refcon parameter is not strong.  That means that, unless someone has a strong reference somewhere, the AppleRemote may have already been finalized.  But it should be pretty safe in this case, since if the AppleRemote is finalized, the callback is cancelled and should never be invoked.
 	AppleRemote* remote = (AppleRemote*)refcon;
+	
 	[remote dealWithSecureEventInputChange];
 }
 

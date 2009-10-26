@@ -33,6 +33,7 @@
 */
 @interface AppleRemote : HIDRemoteControlDevice {		
 	BOOL lastSecureEventInputState;
+	io_object_t eventSecureInputNotification;
 }
 
 - (BOOL) retrieveSecureEventInputState;

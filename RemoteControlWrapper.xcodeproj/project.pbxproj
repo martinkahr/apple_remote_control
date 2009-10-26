@@ -13,8 +13,8 @@
 		5B2179AD0C09D6C9003D84DA /* HIDRemoteControlDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B92775E0B78CABC0058AA16 /* HIDRemoteControlDevice.m */; };
 		5B2179AF0C09D6CF003D84DA /* MultiClickRemoteBehavior.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B92749B0B78B3750058AA16 /* MultiClickRemoteBehavior.m */; };
 		5B2179B00C09D6D0003D84DA /* RemoteControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B9274A00B78B3B20058AA16 /* RemoteControl.m */; };
-		5B5033D6108EE854005EE1AB /* README.markdown in Resources */ = {isa = PBXBuildFile; fileRef = 5B5033D5108EE854005EE1AB /* README.markdown */; };
 		5B7B50F309C218D1009158D3 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B7B50F209C218D1009158D3 /* IOKit.framework */; };
+		5B8D4DE80C55D676008A1C8A /* readme.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B8D4DE70C55D676008A1C8A /* readme.txt */; };
 		5BF9B62109C2224600EFA68D /* System.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BF9B62009C2224600EFA68D /* System.framework */; };
 		5BF9B9D809C9B00900EFA68D /* MainController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF9B9D709C9B00900EFA68D /* MainController.m */; };
 		5BF9BA8109C9BA2200EFA68D /* RemoteFeedbackView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF9BA8009C9BA2200EFA68D /* RemoteFeedbackView.m */; };
@@ -48,8 +48,8 @@
 		5B0023230C5628C400FB1521 /* RemoteControlWrapper_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = RemoteControlWrapper_Prefix.pch; sourceTree = "<group>"; };
 		5B0CD6FF0C1FA7B700FB6330 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		5B102D6F0C3C04C800514E74 /* license.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = license.txt; sourceTree = "<group>"; };
-		5B5033D5108EE854005EE1AB /* README.markdown */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.markdown; sourceTree = "<group>"; };
 		5B7B50F209C218D1009158D3 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		5B8D4DE70C55D676008A1C8A /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = readme.txt; sourceTree = "<group>"; };
 		5B92749A0B78B3750058AA16 /* MultiClickRemoteBehavior.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MultiClickRemoteBehavior.h; sourceTree = "<group>"; };
 		5B92749B0B78B3750058AA16 /* MultiClickRemoteBehavior.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MultiClickRemoteBehavior.m; sourceTree = "<group>"; };
 		5B92749F0B78B3B20058AA16 /* RemoteControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RemoteControl.h; sourceTree = "<group>"; };
@@ -123,8 +123,8 @@
 		29B97314FDCFA39411CA2CEA /* AppleRemote */ = {
 			isa = PBXGroup;
 			children = (
-				5B5033D5108EE854005EE1AB /* README.markdown */,
 				5B102D6F0C3C04C800514E74 /* license.txt */,
+				5B8D4DE70C55D676008A1C8A /* readme.txt */,
 				5B8D4E000C55DF0F008A1C8A /* Remote Control */,
 				080E96DDFE201D6D7F000001 /* Test Client */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
@@ -230,7 +230,7 @@
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				5BF9BC9509C9D23B00EFA68D /* AppleRemote.tiff in Resources */,
 				5B102D700C3C04C800514E74 /* license.txt in Resources */,
-				5B5033D6108EE854005EE1AB /* README.markdown in Resources */,
+				5B8D4DE80C55D676008A1C8A /* readme.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -27,13 +27,9 @@
 
 #import "HIDRemoteControlDevice.h"
 
-#import <mach/mach.h>
-#import <mach/mach_error.h>
 #import <IOKit/IOKitLib.h>
 #import <IOKit/IOCFPlugIn.h>
 #import <IOKit/hid/IOHIDKeys.h>
-#import <IOKit/hid/IOHIDUsageTables.h>
-#import <Carbon/Carbon.h>
 
 @interface HIDRemoteControlDevice (PrivateMethods) 
 - (NSDictionary*) cookieToButtonMapping;
@@ -81,25 +77,23 @@
 	// Now search I/O Registry for matching devices.
 	ioReturnValue = IOServiceGetMatchingServices(kIOMasterPortDefault, hidMatchDictionary, &hidObjectIterator);
 	
-	if ((ioReturnValue == kIOReturnSuccess) && (hidObjectIterator != 0)) {
-		hidDevice = IOIteratorNext(hidObjectIterator);
+	if (hidObjectIterator != 0) {
+		if (ioReturnValue == kIOReturnSuccess) {
+			hidDevice = IOIteratorNext(hidObjectIterator);
+		}
+		// release the iterator
+		IOObjectRelease(hidObjectIterator);
 	}
 	
-	// release the iterator
-	IOObjectRelease(hidObjectIterator);
-	
+	// Returned value must be released by the caller when it is finished
 	return hidDevice;
 }
 
 - (id) initWithDelegate: (id) _remoteControlDelegate {	
 	if ([[self class] isRemoteAvailable] == NO) {
-		// http://lists.apple.com/archives/Objc-language/2008/Sep/msg00133.html
 		[super dealloc];
-
-		return nil;
-	}
-	
-	if ( (self = [super initWithDelegate: _remoteControlDelegate]) ) {
+		self = nil;
+	} else if ( (self = [super initWithDelegate: _remoteControlDelegate]) ) {
 		openInExclusiveMode = YES;
 		queue = NULL;
 		hidDeviceInterface = NULL;
@@ -121,7 +115,7 @@
 - (void) dealloc {
 	[self removeNotifcationObserver];
 	[self stopListening:self];
-	[cookieToButtonMapping release];
+	[cookieToButtonMapping release]; cookieToButtonMapping = nil;
 	[super dealloc];
 }
 
@@ -375,11 +369,11 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 		if ( result != kIOReturnSuccess )
 			continue;
 	
-		//printf("%d %d %d\n", event.elementCookie, event.value, event.longValue);		
+		//printf("%u %d %p\n", event.elementCookie, event.value, event.longValue);		
 		
 		if (((int)event.elementCookie)!=5) {
 			sumOfValues+=event.value;
-			[cookieString appendString:[NSString stringWithFormat:@"%d_", event.elementCookie]];
+			[cookieString appendString:[NSString stringWithFormat:@"%u_", event.elementCookie]];
 		}
 	}
 
