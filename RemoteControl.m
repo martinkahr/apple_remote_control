@@ -52,7 +52,7 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 }
 
 - (void) dealloc {
-	[delegate release];
+	[delegate release]; delegate = nil;
 	[super dealloc];
 }
 
