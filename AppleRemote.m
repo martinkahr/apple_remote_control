@@ -105,6 +105,7 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 			leopardEmulation = CFEqual(leoEmuAttr, kCFBooleanTrue);			
 			CFRelease(leoEmuAttr);
 		}
+		IOObjectRelease(foundRemoteDevice);
 	}
 
 	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_4) {
