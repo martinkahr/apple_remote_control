@@ -28,7 +28,6 @@
 }
 
 - (void) awakeFromNib {
-	NSLog(@"number is %f", NSAppKitVersionNumber);
 	AppleRemote* newRemoteControl = [[[AppleRemote alloc] initWithDelegate: self] autorelease];
 	[newRemoteControl setDelegate: self];	
 

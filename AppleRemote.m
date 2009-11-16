@@ -68,7 +68,7 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 		// is changing.
 		io_registry_entry_t root = IORegistryGetRootEntry( kIOMasterPortDefault );  
 		if (root != MACH_PORT_NULL) {
-			IONotificationPortRef notifyPort = IONotificationPortCreate( kIOMasterPortDefault );
+			notifyPort = IONotificationPortCreate( kIOMasterPortDefault );
 			if (notifyPort) {
 				CFRunLoopSourceRef runLoopSource = IONotificationPortGetRunLoopSource(notifyPort);	
 				CFRunLoopRef gRunLoop = CFRunLoopGetCurrent();
@@ -81,31 +81,37 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 														  entry,
 														  kIOBusyInterest, 
 														  &IOREInterestCallback, self, &eventSecureInputNotification );
-					(void)kr;
+					if (kr != KERN_SUCCESS) {				
+						NSLog(@"Error when installing EventSecureInput Notification");
+						IONotificationPortDestroy(notifyPort);
+						notifyPort = NULL;
+					}
 					IOObjectRelease(entry);
-				}
-				IONotificationPortDestroy(notifyPort);
+				}				
 			}
 			IOObjectRelease(root);
 		}
 		
-		lastSecureEventInputState = [self retrieveSecureEventInputState];
-		
+		lastSecureEventInputState = [self retrieveSecureEventInputState];			
 	}
 	return self;
 }
 
 - (void)dealloc
 {
+	IONotificationPortDestroy(notifyPort);
+	notifyPort = NULL;
 	IOObjectRelease (eventSecureInputNotification);
-	eventSecureInputNotification = MACH_PORT_NULL;
+	eventSecureInputNotification = MACH_PORT_NULL;		
 	
 	[super dealloc];
 }
 
 - (void)finalize
 {
-	// Although IOObjectRelease is not documented as thread safe, I was assured at WWDC09 that it is.
+	IONotificationPortDestroy(notifyPort);	
+	notifyPort = NULL;
+	// Although IOObjectRelease is not documented as thread safe, I was assured at WWDC09 that it is.	
 	IOObjectRelease (eventSecureInputNotification);
 	eventSecureInputNotification = MACH_PORT_NULL;
 	
@@ -166,6 +172,13 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu_Hold]	forKey:@"33_21_20_2_33_21_20_2_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"37_33_21_20_2_37_33_21_20_2_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]	forKey:@"19_"];		
+		
+		// new Aluminum model
+		// Mappings changed due to addition of a 7th center button
+		// Treat the new center button and play/pause button the same
+		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]		forKey:@"33_21_20_8_2_33_21_20_8_2_"];
+		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]		forKey:@"33_21_20_3_2_33_21_20_3_2_"];
+		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"33_21_20_11_2_33_21_20_11_2_"];		
 	}
 
 }
@@ -184,6 +197,73 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 	}
 }
 
+// overwritten to handle a special case with old versions of the rb driver
++ (io_object_t) findRemoteDevice
+{
+	CFMutableDictionaryRef hidMatchDictionary = NULL;
+	IOReturn ioReturnValue = kIOReturnSuccess;	
+	io_iterator_t hidObjectIterator = 0;
+	io_object_t	hidDevice = 0;
+	
+	// Set up a matching dictionary to search the I/O Registry by class
+	// name for all HID class devices
+	hidMatchDictionary = IOServiceMatching([self remoteControlDeviceName]);
+	
+	// Now search I/O Registry for matching devices.
+	ioReturnValue = IOServiceGetMatchingServices(kIOMasterPortDefault, hidMatchDictionary, &hidObjectIterator);
+	
+	if ((ioReturnValue == kIOReturnSuccess) && (hidObjectIterator != 0))
+	{
+		io_object_t matchingService = 0, foundService = 0;
+		BOOL finalMatch = NO;
+		
+		while (matchingService = IOIteratorNext(hidObjectIterator))
+		{
+			if (!finalMatch)
+			{
+				CFTypeRef className;
+				
+				if (!foundService)
+				{
+					if (IOObjectRetain(matchingService) == kIOReturnSuccess)
+					{
+						foundService = matchingService;
+					}
+				}
+				
+				if (className = IORegistryEntryCreateCFProperty((io_registry_entry_t)matchingService, CFSTR("IOClass"), kCFAllocatorDefault, 0))
+				{
+					if ([(NSString *)className isEqual:[NSString stringWithUTF8String:[self remoteControlDeviceName]]])
+					{
+						if (foundService)
+						{
+							IOObjectRelease(foundService);
+							foundService = 0;
+						}
+						
+						if (IOObjectRetain(matchingService) == kIOReturnSuccess)
+						{
+							foundService = matchingService;
+							finalMatch = YES;
+						}
+					}
+					
+					CFRelease(className);
+				}
+			}
+			
+			IOObjectRelease(matchingService);
+		}
+		
+		hidDevice = foundService;
+		
+		// release the iterator
+		IOObjectRelease(hidObjectIterator);
+	}
+	
+	return hidDevice;
+}
+
 - (BOOL) retrieveSecureEventInputState {
 	BOOL returnValue = NO;
 	
@@ -192,9 +272,12 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 		CFArrayRef arrayRef = IORegistryEntrySearchCFProperty(root, kIOServicePlane, CFSTR("IOConsoleUsers"), NULL, kIORegistryIterateRecursively);
 		if (arrayRef != NULL) {
 			NSArray* array = (NSArray*)arrayRef;
-			if ([array count]>0) {
-				NSDictionary* dict = [array objectAtIndex: 0];
-				returnValue = ([dict objectForKey:@"kCGSSessionSecureInputPID"] != nil);
+			unsigned int i;
+			for(i=0; i < [array count]; i++) {
+				NSDictionary* dict = [array objectAtIndex:i];
+				if ([[dict objectForKey: @"kCGSSessionUserNameKey"] isEqual: NSUserName()]) {					
+					returnValue = ([dict objectForKey:@"kCGSSessionSecureInputPID"] != nil);					
+				}
 			}
 			CFRelease(arrayRef);
 		}
@@ -207,7 +290,7 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 	if ([self isListeningToRemote] == NO || [self isOpenInExclusiveMode] == NO) return;
 	
 	BOOL newState = [self retrieveSecureEventInputState];
-	if (lastSecureEventInputState == newState) return;
+	if (lastSecureEventInputState == newState) return;	
 	
 	// close and open the device again
 	[self closeRemoteControlDevice: NO];
