@@ -99,21 +99,35 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 
 - (void)dealloc
 {
-	IONotificationPortDestroy(notifyPort);
-	notifyPort = NULL;
-	IOObjectRelease (eventSecureInputNotification);
-	eventSecureInputNotification = MACH_PORT_NULL;
+	if (notifyPort)
+	{
+		IONotificationPortDestroy(notifyPort);
+		notifyPort = NULL;
+	}
+	
+	if (eventSecureInputNotification)
+	{
+		IOObjectRelease (eventSecureInputNotification);
+		eventSecureInputNotification = MACH_PORT_NULL;
+	}
 	
 	[super dealloc];
 }
 
 - (void)finalize
 {
-	IONotificationPortDestroy(notifyPort);
-	notifyPort = NULL;
-	// Although IOObjectRelease is not documented as thread safe, I was assured at WWDC09 that it is.
-	IOObjectRelease (eventSecureInputNotification);
-	eventSecureInputNotification = MACH_PORT_NULL;
+	if (notifyPort)
+	{
+		IONotificationPortDestroy(notifyPort);
+		notifyPort = NULL;
+	}
+	
+	if (eventSecureInputNotification)
+	{
+		// Although IOObjectRelease is not documented as thread safe, I was assured at WWDC09 that it is.
+		IOObjectRelease (eventSecureInputNotification);
+		eventSecureInputNotification = MACH_PORT_NULL;
+	}
 	
 	[super finalize];
 }
