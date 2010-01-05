@@ -381,7 +381,7 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 
 	[remote handleEventWithCookieString: cookieString sumOfValues: sumOfValues];
 	
-	[pool release];
+	[pool drain];
 }
 
 @implementation HIDRemoteControlDevice (IOKitMethods)
