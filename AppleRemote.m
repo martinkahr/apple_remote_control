@@ -136,7 +136,7 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 
 	// check if we are using the rb device driver instead of the one from Apple
 	io_object_t foundRemoteDevice = [[self class] findRemoteDevice];
-	BOOL leopardEmulation = NO;
+	Boolean leopardEmulation = false;
 	if (foundRemoteDevice != 0) {
 		CFTypeRef leoEmuAttr = IORegistryEntryCreateCFProperty(foundRemoteDevice, CFSTR("RemoteBuddyEmulationV2"), kCFAllocatorDefault, 0);
 		if (leoEmuAttr) {
