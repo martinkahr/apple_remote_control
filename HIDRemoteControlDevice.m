@@ -291,7 +291,8 @@ cleanup:
 			
 	NSNumber* buttonId = [[self cookieToButtonMapping] objectForKey: cookieString];
 	if (buttonId != nil) {
-		[self sendRemoteButtonEvent: [buttonId intValue] pressedDown: (sumOfValues>0)];
+		RemoteControlEventIdentifier remoteControlEvent = (RemoteControlEventIdentifier)[buttonId intValue];
+		[self sendRemoteButtonEvent: remoteControlEvent pressedDown: (sumOfValues>0)];
 	} else {
 		// let's see if this is the first event after a restart of the OS. 
 		// In this case the event has a prefix that we can ignore and we just get the down event but no up event
@@ -302,8 +303,9 @@ cleanup:
 			if (range.location != NSNotFound && range.location > 0) {
 				buttonId = [[self cookieToButtonMapping] objectForKey: key];
 				if (buttonId != nil) {
-					[self sendRemoteButtonEvent: [buttonId intValue] pressedDown: YES];
-					[self sendRemoteButtonEvent: [buttonId intValue] pressedDown: NO];
+					RemoteControlEventIdentifier remoteControlEvent = (RemoteControlEventIdentifier)[buttonId intValue];
+					[self sendRemoteButtonEvent: remoteControlEvent pressedDown: YES];
+					[self sendRemoteButtonEvent: remoteControlEvent pressedDown: NO];
 					return;
 				}				
 				return;
@@ -379,7 +381,7 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 
 	[remote handleEventWithCookieString: cookieString sumOfValues: sumOfValues];
 	
-	[pool release];
+	[pool drain];
 }
 
 @implementation HIDRemoteControlDevice (IOKitMethods)

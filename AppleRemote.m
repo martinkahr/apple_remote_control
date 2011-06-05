@@ -66,11 +66,11 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 		// Finally I found a way to get the state of the SecureEventInput
 		// With that information I regain access to the device each time when the SecureEventInput state
 		// is changing.
-		io_registry_entry_t root = IORegistryGetRootEntry( kIOMasterPortDefault );  
+		io_registry_entry_t root = IORegistryGetRootEntry( kIOMasterPortDefault );
 		if (root != MACH_PORT_NULL) {
 			notifyPort = IONotificationPortCreate( kIOMasterPortDefault );
 			if (notifyPort) {
-				CFRunLoopSourceRef runLoopSource = IONotificationPortGetRunLoopSource(notifyPort);	
+				CFRunLoopSourceRef runLoopSource = IONotificationPortGetRunLoopSource(notifyPort);
 				CFRunLoopRef gRunLoop = CFRunLoopGetCurrent();
 				CFRunLoopAddSource(gRunLoop, runLoopSource, kCFRunLoopDefaultMode);
 				
@@ -79,41 +79,55 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 					kern_return_t kr;
 					kr = IOServiceAddInterestNotification(notifyPort,
 														  entry,
-														  kIOBusyInterest, 
+														  kIOBusyInterest,
 														  &IOREInterestCallback, self, &eventSecureInputNotification );
-					if (kr != KERN_SUCCESS) {				
+					if (kr != KERN_SUCCESS) {
 						NSLog(@"Error when installing EventSecureInput Notification");
 						IONotificationPortDestroy(notifyPort);
 						notifyPort = NULL;
 					}
 					IOObjectRelease(entry);
-				}				
+				}
 			}
 			IOObjectRelease(root);
 		}
 		
-		lastSecureEventInputState = [self retrieveSecureEventInputState];			
+		lastSecureEventInputState = [self retrieveSecureEventInputState];
 	}
 	return self;
 }
 
 - (void)dealloc
 {
-	IONotificationPortDestroy(notifyPort);
-	notifyPort = NULL;
-	IOObjectRelease (eventSecureInputNotification);
-	eventSecureInputNotification = MACH_PORT_NULL;		
+	if (notifyPort)
+	{
+		IONotificationPortDestroy(notifyPort);
+		notifyPort = NULL;
+	}
+	
+	if (eventSecureInputNotification)
+	{
+		IOObjectRelease (eventSecureInputNotification);
+		eventSecureInputNotification = MACH_PORT_NULL;
+	}
 	
 	[super dealloc];
 }
 
 - (void)finalize
 {
-	IONotificationPortDestroy(notifyPort);	
-	notifyPort = NULL;
-	// Although IOObjectRelease is not documented as thread safe, I was assured at WWDC09 that it is.	
-	IOObjectRelease (eventSecureInputNotification);
-	eventSecureInputNotification = MACH_PORT_NULL;
+	if (notifyPort)
+	{
+		IONotificationPortDestroy(notifyPort);
+		notifyPort = NULL;
+	}
+	
+	if (eventSecureInputNotification)
+	{
+		// Although IOObjectRelease is not documented as thread safe, I was assured at WWDC09 that it is.
+		IOObjectRelease (eventSecureInputNotification);
+		eventSecureInputNotification = MACH_PORT_NULL;
+	}
 	
 	[super finalize];
 }
@@ -122,21 +136,21 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 
 	// check if we are using the rb device driver instead of the one from Apple
 	io_object_t foundRemoteDevice = [[self class] findRemoteDevice];
-	BOOL leopardEmulation = NO;
+	Boolean leopardEmulation = false;
 	if (foundRemoteDevice != 0) {
 		CFTypeRef leoEmuAttr = IORegistryEntryCreateCFProperty(foundRemoteDevice, CFSTR("RemoteBuddyEmulationV2"), kCFAllocatorDefault, 0);
 		if (leoEmuAttr) {
-			leopardEmulation = CFEqual(leoEmuAttr, kCFBooleanTrue);			
+			leopardEmulation = CFEqual(leoEmuAttr, kCFBooleanTrue);
 			CFRelease(leoEmuAttr);
 		}
 		IOObjectRelease(foundRemoteDevice);
 	}
-
+	
 	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_4) {
 		// 10.4.x Tiger
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlus]		forKey:@"14_12_11_6_"];
-		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMinus]		forKey:@"14_13_11_6_"];		
-		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu]		forKey:@"14_7_6_14_7_6_"];			
+		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMinus]		forKey:@"14_13_11_6_"];
+		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu]		forKey:@"14_7_6_14_7_6_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]		forKey:@"14_8_6_14_8_6_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonRight]		forKey:@"14_9_6_14_9_6_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft]		forKey:@"14_10_6_14_10_6_"];
@@ -144,11 +158,11 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft_Hold]	forKey:@"14_6_3_2_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu_Hold]	forKey:@"14_6_14_6_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"18_14_6_18_14_6_"];
-		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]	forKey:@"19_"];			
+		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]	forKey:@"19_"];
 	} else if ((floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_5) || (leopardEmulation)) {
 		// 10.5.x Leopard
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlus]		forKey:@"31_29_28_19_18_"];
-		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMinus]		forKey:@"31_30_28_19_18_"];	
+		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMinus]		forKey:@"31_30_28_19_18_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu]		forKey:@"31_20_19_18_31_20_19_18_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]		forKey:@"31_21_19_18_31_21_19_18_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonRight]		forKey:@"31_22_19_18_31_22_19_18_"];
@@ -157,10 +171,10 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft_Hold]	forKey:@"31_19_18_3_2_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu_Hold]	forKey:@"31_19_18_31_19_18_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"35_31_19_18_35_31_19_18_"];
-		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]	forKey:@"19_"];			
+		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]	forKey:@"19_"];
 	} else {
 		// 10.6.2 Snow Leopard
-		// Note: does not work on 10.6.0 and 10.6.1		
+		// Note: does not work on 10.6.0 and 10.6.1
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlus]		forKey:@"33_31_30_21_20_2_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMinus]		forKey:@"33_32_30_21_20_2_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu]		forKey:@"33_22_21_20_2_33_22_21_20_2_"];
@@ -171,14 +185,14 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft_Hold]	forKey:@"33_21_20_13_12_2_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu_Hold]	forKey:@"33_21_20_2_33_21_20_2_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"37_33_21_20_2_37_33_21_20_2_"];
-		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]	forKey:@"19_"];		
+		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]	forKey:@"19_"];
 		
 		// new Aluminum model
 		// Mappings changed due to addition of a 7th center button
 		// Treat the new center button and play/pause button the same
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]		forKey:@"33_21_20_8_2_33_21_20_8_2_"];
 		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]		forKey:@"33_21_20_3_2_33_21_20_3_2_"];
-		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"33_21_20_11_2_33_21_20_11_2_"];		
+		[_cookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"33_21_20_11_2_33_21_20_11_2_"];
 	}
 
 }
@@ -187,7 +201,7 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 	if (pressedDown == NO && event == kRemoteButtonMenu_Hold) {
 		// There is no seperate event for pressed down on menu hold. We are simulating that event here
 		[super sendRemoteButtonEvent:event pressedDown:YES];
-	}	
+	}
 	
 	[super sendRemoteButtonEvent:event pressedDown:pressedDown];
 	
@@ -197,11 +211,11 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 	}
 }
 
-// overwritten to handle a special case with old versions of the rb driver
+// overridden to handle a special case with old versions of the rb driver
 + (io_object_t) findRemoteDevice
 {
 	CFMutableDictionaryRef hidMatchDictionary = NULL;
-	IOReturn ioReturnValue = kIOReturnSuccess;	
+	IOReturn ioReturnValue = kIOReturnSuccess;
 	io_iterator_t hidObjectIterator = 0;
 	io_object_t	hidDevice = 0;
 	
@@ -217,12 +231,10 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 		io_object_t matchingService = 0, foundService = 0;
 		BOOL finalMatch = NO;
 		
-		while (matchingService = IOIteratorNext(hidObjectIterator))
+		while ((matchingService = IOIteratorNext(hidObjectIterator)))
 		{
 			if (!finalMatch)
 			{
-				CFTypeRef className;
-				
 				if (!foundService)
 				{
 					if (IOObjectRetain(matchingService) == kIOReturnSuccess)
@@ -231,7 +243,8 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 					}
 				}
 				
-				if (className = IORegistryEntryCreateCFProperty((io_registry_entry_t)matchingService, CFSTR("IOClass"), kCFAllocatorDefault, 0))
+				CFTypeRef className = IORegistryEntryCreateCFProperty((io_registry_entry_t)matchingService, CFSTR("IOClass"), kCFAllocatorDefault, 0);
+				if (className)
 				{
 					if ([(NSString *)className isEqual:[NSString stringWithUTF8String:[self remoteControlDeviceName]]])
 					{
@@ -267,7 +280,7 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 - (BOOL) retrieveSecureEventInputState {
 	BOOL returnValue = NO;
 	
-	io_registry_entry_t root = IORegistryGetRootEntry( kIOMasterPortDefault );  
+	io_registry_entry_t root = IORegistryGetRootEntry( kIOMasterPortDefault );
 	if (root != MACH_PORT_NULL) {
 		CFArrayRef arrayRef = IORegistryEntrySearchCFProperty(root, kIOServicePlane, CFSTR("IOConsoleUsers"), NULL, kIORegistryIterateRecursively);
 		if (arrayRef != NULL) {
@@ -275,8 +288,8 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 			unsigned int i;
 			for(i=0; i < [array count]; i++) {
 				NSDictionary* dict = [array objectAtIndex:i];
-				if ([[dict objectForKey: @"kCGSSessionUserNameKey"] isEqual: NSUserName()]) {					
-					returnValue = ([dict objectForKey:@"kCGSSessionSecureInputPID"] != nil);					
+				if ([[dict objectForKey: @"kCGSSessionUserNameKey"] isEqual: NSUserName()]) {
+					returnValue = ([dict objectForKey:@"kCGSSessionSecureInputPID"] != nil);
 				}
 			}
 			CFRelease(arrayRef);
@@ -290,7 +303,7 @@ const char* AppleRemoteDeviceName = "AppleIRController";
 	if ([self isListeningToRemote] == NO || [self isOpenInExclusiveMode] == NO) return;
 	
 	BOOL newState = [self retrieveSecureEventInputState];
-	if (lastSecureEventInputState == newState) return;	
+	if (lastSecureEventInputState == newState) return;
 	
 	// close and open the device again
 	[self closeRemoteControlDevice: NO];
@@ -303,7 +316,7 @@ static void IOREInterestCallback(void *			refcon,
 								 io_service_t	service,
 								 uint32_t		messageType,
 								 void *			messageArgument )
-{	
+{
 	(void)service;
 	(void)messageType;
 	(void)messageArgument;
