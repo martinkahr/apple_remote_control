@@ -29,12 +29,21 @@
 #import <Cocoa/Cocoa.h>
 #import "RemoteControl.h"
 
+/*
+ * Method definitions for the delegate of the MultiClickRemoteBehavior class
+ */
+@protocol MultiClickRemoteBehaviorDelegate <NSObject>
+
+- (void) remoteButton: (RemoteControlEventIdentifier)buttonIdentifier pressedDown: (BOOL) pressedDown clickCount: (unsigned int) count;
+
+@end
+
 /**
 	A behavior that adds multiclick and hold events on top of a device.
 	Events are generated and send to a delegate
  */
 @interface MultiClickRemoteBehavior : NSObject {
-	id delegate;
+	id<MultiClickRemoteBehaviorDelegate> delegate;
 	
 	// state for simulating plus/minus hold
 	BOOL simulateHoldEvents;	
@@ -53,8 +62,8 @@
 - (id) init;
 
 // Delegates are not retained
-- (void) setDelegate: (id) delegate;
-- (id) delegate;
+- (void) setDelegate: (id<MultiClickRemoteBehaviorDelegate>) delegate;
+- (id<MultiClickRemoteBehaviorDelegate>) delegate;
 
 // Simulating hold events does deactivate sending of individual requests for pressed down/released.
 // Instead special hold events are being triggered when the user is pressing and holding a button for a small period.
@@ -77,14 +86,5 @@
 // the maximum time difference till which clicks are recognized as multi clicks
 - (NSTimeInterval) maximumClickCountTimeDifference;
 - (void) setMaximumClickCountTimeDifference: (NSTimeInterval) timeDiff;
-
-@end
-
-/* 
- * Method definitions for the delegate of the MultiClickRemoteBehavior class
- */
-@interface NSObject(MultiClickRemoteBehaviorDelegate)
-
-- (void) remoteButton: (RemoteControlEventIdentifier)buttonIdentifier pressedDown: (BOOL) pressedDown clickCount: (unsigned int) count;
 
 @end

@@ -64,9 +64,11 @@ typedef enum _RemoteControlEventIdentifier {
 	kRemoteControl_Switched			=1<<13,
 } RemoteControlEventIdentifier;
 
-@interface NSObject(RemoteControlDelegate)
+@protocol RemoteControlDelegate <NSObject>
 
 - (void) sendRemoteButtonEvent: (RemoteControlEventIdentifier) event pressedDown: (BOOL) pressedDown remoteControl: (RemoteControl*) remoteControl;
+
+@optional
 
 @end
 
@@ -74,14 +76,14 @@ typedef enum _RemoteControlEventIdentifier {
 	Base Interface for Remote Control devices
 */
 @interface RemoteControl : NSObject {
-	id delegate;
+	id<RemoteControlDelegate> delegate;
 }
 
 // returns nil if the remote control device is not available
-- (id) initWithDelegate: (id) remoteControlDelegate;
+- (id) initWithDelegate: (id<RemoteControlDelegate>) remoteControlDelegate;
 
-- (void) setDelegate: (id) value;
-- (id) delegate;
+- (void) setDelegate: (id<RemoteControlDelegate>) value;
+- (id<RemoteControlDelegate>) delegate;
 
 - (void) setListeningToRemote: (BOOL) value;
 - (BOOL) isListeningToRemote;
