@@ -371,11 +371,11 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 		if ( result != kIOReturnSuccess )
 			continue;
 	
-		//printf("%u %d %p\n", event.elementCookie, event.value, event.longValue);		
+		//printf("%lu %d %p\n", (unsigned long)event.elementCookie, event.value, event.longValue);
 		
-		if (((int)event.elementCookie)!=5) {
+		if (((unsigned long)event.elementCookie)!=5) {
 			sumOfValues+=event.value;
-			[cookieString appendString:[NSString stringWithFormat:@"%u_", event.elementCookie]];
+			[cookieString appendString:[NSString stringWithFormat:@"%lu_", (unsigned long)event.elementCookie]];
 		}
 	}
 
