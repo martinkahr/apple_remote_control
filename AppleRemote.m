@@ -47,7 +47,7 @@ static void IOREInterestCallback(
 	#define NSAppKitVersionNumber10_5 949
 #endif
 
-const char* AppleRemoteDeviceName = "AppleIRController";
+static const char* AppleRemoteDeviceName = "AppleIRController";
 
 @implementation AppleRemote
 
