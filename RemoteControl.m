@@ -43,9 +43,9 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 @implementation RemoteControl
 
 // returns nil if the remote control device is not available
-- (id) initWithDelegate: (id<RemoteControlDelegate>) _remoteControlDelegate {
+- (id) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
 	if ( (self = [super init]) ) {
-		delegate = _remoteControlDelegate;
+		delegate = inRemoteControlDelegate;
 	}
 	return self;
 }

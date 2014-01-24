@@ -3,7 +3,7 @@
  * RemoteControlWrapper
  *
  * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
- * Copyright (c) 2006 martinkahr.com. All rights reserved.
+ * Copyright (c) 2006-2014 martinkahr.com. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -55,8 +55,8 @@ static const char* AppleRemoteDeviceName = "AppleIRController";
 	return AppleRemoteDeviceName;
 }
 
-- (id) initWithDelegate: (id) _remoteControlDelegate {
-	if ((self = [super initWithDelegate: _remoteControlDelegate])) {
+- (id) initWithDelegate: (id) inRemoteControlDelegate {
+	if ((self = [super initWithDelegate: inRemoteControlDelegate])) {
 		// A security update in february of 2007 introduced an odd behavior.
 		// Whenever SecureEventInput is activated or deactivated the exclusive access
 		// to the apple remote control device is lost. This leads to very strange behavior where

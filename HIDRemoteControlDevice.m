@@ -3,7 +3,7 @@
  * RemoteControlWrapper
  *
  * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
- * Copyright (c) 2006 martinkahr.com. All rights reserved.
+ * Copyright (c) 2006-2014 martinkahr.com. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -89,11 +89,11 @@
 	return hidDevice;
 }
 
-- (id) initWithDelegate: (id) _remoteControlDelegate {	
+- (id) initWithDelegate: (id) inRemoteControlDelegate {	
 	if ([[self class] isRemoteAvailable] == NO) {
 		[super dealloc];
 		self = nil;
-	} else if ( (self = [super initWithDelegate: _remoteControlDelegate]) ) {
+	} else if ( (self = [super initWithDelegate: inRemoteControlDelegate]) ) {
 		openInExclusiveMode = YES;
 		queue = NULL;
 		hidDeviceInterface = NULL;
