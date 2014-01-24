@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5B0CD7000C1FA7B700FB6330 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B0CD6FF0C1FA7B700FB6330 /* Carbon.framework */; };
 		5B102D700C3C04C800514E74 /* license.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B102D6F0C3C04C800514E74 /* license.txt */; };
 		5B2179AC0C09D6C5003D84DA /* AppleRemote.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF9B75709C243FD00EFA68D /* AppleRemote.m */; };
 		5B2179AD0C09D6C9003D84DA /* HIDRemoteControlDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B92775E0B78CABC0058AA16 /* HIDRemoteControlDevice.m */; };
@@ -46,7 +45,6 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		5B0023230C5628C400FB1521 /* RemoteControlWrapper_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = RemoteControlWrapper_Prefix.pch; sourceTree = "<group>"; };
-		5B0CD6FF0C1FA7B700FB6330 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		5B102D6F0C3C04C800514E74 /* license.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = license.txt; sourceTree = "<group>"; };
 		5B5033D5108EE854005EE1AB /* README.markdown */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.markdown; sourceTree = "<group>"; };
 		5B7B50F209C218D1009158D3 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
@@ -76,7 +74,6 @@
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				5B7B50F309C218D1009158D3 /* IOKit.framework in Frameworks */,
 				5BF9B62109C2224600EFA68D /* System.framework in Frameworks */,
-				5B0CD7000C1FA7B700FB6330 /* Carbon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,7 +155,6 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				5B0CD6FF0C1FA7B700FB6330 /* Carbon.framework */,
 				5BF9B62009C2224600EFA68D /* System.framework */,
 				5B7B50F209C218D1009158D3 /* IOKit.framework */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
