@@ -11,9 +11,9 @@
 
 @interface RemoteFeedbackView : NSView
 {
-	NSImage* remoteImage;
-	RemoteControlEventIdentifier lastButtonIdentifier;
-	BOOL drawn;
+	NSImage* _remoteImage;
+	RemoteControlEventIdentifier _lastButtonIdentifier;
+	BOOL _drawn;
 }
 
 - (void) remoteButton: (RemoteControlEventIdentifier)buttonIdentifier pressedDown: (BOOL) pressedDown clickCount: (unsigned int)clickCount;

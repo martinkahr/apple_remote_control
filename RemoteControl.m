@@ -3,7 +3,7 @@
  * RemoteControlWrapper
  *
  * Created by Martin Kahr on 11.03.06 under a MIT-style license.
- * Copyright (c) 2006-2011 martinkahr.com. All rights reserved.
+ * Copyright (c) 2006-2014 martinkahr.com. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -45,22 +45,22 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 // returns nil if the remote control device is not available
 - (id) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
 	if ( (self = [super init]) ) {
-		delegate = inRemoteControlDelegate;
+		_delegate = inRemoteControlDelegate;
 	}
 	return self;
 }
 
 - (void) dealloc {
-	delegate = nil;
+	_delegate = nil;
 	[super dealloc];
 }
 
 - (void) setDelegate: (id<RemoteControlDelegate>) value {
-	delegate = value;
+	_delegate = value;
 }
 
 - (id<RemoteControlDelegate>) delegate {
-	return delegate;
+	return _delegate;
 }
 
 - (void) setListeningToRemote: (BOOL) value {

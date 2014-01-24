@@ -12,8 +12,8 @@
 @class RemoteFeedbackView;
 
 @interface MainController : NSObject <MultiClickRemoteBehaviorDelegate> {
-	RemoteControl* remoteControl;
-	MultiClickRemoteBehavior* remoteBehavior;
+	RemoteControl* _remoteControl;
+	MultiClickRemoteBehavior* _remoteBehavior;
 	
 	IBOutlet RemoteFeedbackView*		feedbackView;
 	IBOutlet NSTextField*	feedbackText;

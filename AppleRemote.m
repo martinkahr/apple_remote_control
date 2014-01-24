@@ -68,23 +68,23 @@ static const char* AppleRemoteDeviceName = "AppleIRController";
 		// is changing.
 		io_registry_entry_t root = IORegistryGetRootEntry( kIOMasterPortDefault );
 		if (root != MACH_PORT_NULL) {
-			notifyPort = IONotificationPortCreate( kIOMasterPortDefault );
-			if (notifyPort) {
-				CFRunLoopSourceRef runLoopSource = IONotificationPortGetRunLoopSource(notifyPort);
+			_notifyPort = IONotificationPortCreate( kIOMasterPortDefault );
+			if (_notifyPort) {
+				CFRunLoopSourceRef runLoopSource = IONotificationPortGetRunLoopSource(_notifyPort);
 				CFRunLoopRef gRunLoop = CFRunLoopGetCurrent();
 				CFRunLoopAddSource(gRunLoop, runLoopSource, kCFRunLoopDefaultMode);
 				
 				io_registry_entry_t entry = IORegistryEntryFromPath( kIOMasterPortDefault, kIOServicePlane ":/");
 				if (entry != MACH_PORT_NULL) {
 					kern_return_t kr;
-					kr = IOServiceAddInterestNotification(notifyPort,
+					kr = IOServiceAddInterestNotification(_notifyPort,
 														  entry,
 														  kIOBusyInterest,
-														  &IOREInterestCallback, self, &eventSecureInputNotification );
+														  &IOREInterestCallback, self, &_eventSecureInputNotification );
 					if (kr != KERN_SUCCESS) {
 						NSLog(@"Error when installing EventSecureInput Notification");
-						IONotificationPortDestroy(notifyPort);
-						notifyPort = NULL;
+						IONotificationPortDestroy(_notifyPort);
+						_notifyPort = NULL;
 					}
 					IOObjectRelease(entry);
 				}
@@ -92,23 +92,23 @@ static const char* AppleRemoteDeviceName = "AppleIRController";
 			IOObjectRelease(root);
 		}
 		
-		lastSecureEventInputState = [self retrieveSecureEventInputState];
+		_lastSecureEventInputState = [self retrieveSecureEventInputState];
 	}
 	return self;
 }
 
 - (void)dealloc
 {
-	if (notifyPort)
+	if (_notifyPort)
 	{
-		IONotificationPortDestroy(notifyPort);
-		notifyPort = NULL;
+		IONotificationPortDestroy(_notifyPort);
+		_notifyPort = NULL;
 	}
 	
-	if (eventSecureInputNotification)
+	if (_eventSecureInputNotification)
 	{
-		IOObjectRelease (eventSecureInputNotification);
-		eventSecureInputNotification = MACH_PORT_NULL;
+		IOObjectRelease (_eventSecureInputNotification);
+		_eventSecureInputNotification = MACH_PORT_NULL;
 	}
 	
 	[super dealloc];
@@ -116,17 +116,17 @@ static const char* AppleRemoteDeviceName = "AppleIRController";
 
 - (void)finalize
 {
-	if (notifyPort)
+	if (_notifyPort)
 	{
-		IONotificationPortDestroy(notifyPort);
-		notifyPort = NULL;
+		IONotificationPortDestroy(_notifyPort);
+		_notifyPort = NULL;
 	}
 	
-	if (eventSecureInputNotification)
+	if (_eventSecureInputNotification)
 	{
 		// Although IOObjectRelease is not documented as thread safe, I was assured at WWDC09 that it is.
-		IOObjectRelease (eventSecureInputNotification);
-		eventSecureInputNotification = MACH_PORT_NULL;
+		IOObjectRelease (_eventSecureInputNotification);
+		_eventSecureInputNotification = MACH_PORT_NULL;
 	}
 	
 	[super finalize];
@@ -303,13 +303,13 @@ static const char* AppleRemoteDeviceName = "AppleIRController";
 	if ([self isListeningToRemote] == NO || [self isOpenInExclusiveMode] == NO) return;
 	
 	BOOL newState = [self retrieveSecureEventInputState];
-	if (lastSecureEventInputState == newState) return;
+	if (_lastSecureEventInputState == newState) return;
 	
 	// close and open the device again
 	[self closeRemoteControlDevice: NO];
 	[self openRemoteControlDevice];
 	
-	lastSecureEventInputState = newState;
+	_lastSecureEventInputState = newState;
 } 
 
 static void IOREInterestCallback(void *			refcon,

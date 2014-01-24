@@ -43,20 +43,20 @@
 	Events are generated and send to a delegate
  */
 @interface MultiClickRemoteBehavior : NSObject <RemoteControlDelegate> {
-	id<MultiClickRemoteBehaviorDelegate> delegate;
+	id<MultiClickRemoteBehaviorDelegate> _delegate;
 	
 	// state for simulating plus/minus hold
-	BOOL simulateHoldEvents;	
-	BOOL lastEventSimulatedHold;
-	RemoteControlEventIdentifier lastHoldEvent;
-	NSTimeInterval lastHoldEventTime;	
+	BOOL _simulateHoldEvents;	
+	BOOL _lastEventSimulatedHold;
+	RemoteControlEventIdentifier _lastHoldEvent;
+	NSTimeInterval _lastHoldEventTime;	
 	
 	// state for multi click
-	unsigned int clickCountEnabledButtons;
-	NSTimeInterval maxClickTimeDifference;
-	NSTimeInterval lastClickCountEventTime;	
-	RemoteControlEventIdentifier lastClickCountEvent;
-	unsigned int eventClickCount;	
+	unsigned int _clickCountEnabledButtons;
+	NSTimeInterval _maxClickTimeDifference;
+	NSTimeInterval _lastClickCountEventTime;	
+	RemoteControlEventIdentifier _lastClickCountEvent;
+	unsigned int _eventClickCount;	
 }
 
 - (id) init;

@@ -13,26 +13,26 @@
 @implementation MainController 
 
 - (void) dealloc {
-	[remoteControl autorelease];
-	[remoteBehavior autorelease];
+	[_remoteControl autorelease];
+	[_remoteBehavior autorelease];
 	[super dealloc];
 }
 
 - (void)applicationWillBecomeActive:(NSNotification *)aNotification {
 	NSLog(@"Application will become active - Using remote controls");
-	[remoteControl startListening: self];
+	[_remoteControl startListening: self];
 }
 - (void)applicationWillResignActive:(NSNotification *)aNotification {
 	NSLog(@"Application will resign active - Releasing remote controls");
-	[remoteControl stopListening: self];
+	[_remoteControl stopListening: self];
 }
 
 - (void) awakeFromNib {
 	// The MultiClickRemoteBehavior adds extra functionality.
 	// It works like a middle man between the delegate and the remote control
-	remoteBehavior = [MultiClickRemoteBehavior new];
-	[remoteBehavior setDelegate: self];
-	AppleRemote* newRemoteControl = [[[AppleRemote alloc] initWithDelegate: remoteBehavior] autorelease];
+	_remoteBehavior = [MultiClickRemoteBehavior new];
+	[_remoteBehavior setDelegate: self];
+	AppleRemote* newRemoteControl = [[[AppleRemote alloc] initWithDelegate: _remoteBehavior] autorelease];
 	
 	// set new remote control which will update bindings
 	[self setRemoteControl: newRemoteControl];
@@ -40,11 +40,11 @@
 
 // for bindings access
 - (RemoteControl*) remoteControl {
-	return remoteControl;
+	return _remoteControl;
 }
 - (void) setRemoteControl: (RemoteControl*) newControl {
-	[remoteControl autorelease];
-	remoteControl = [newControl retain];
+	[_remoteControl autorelease];
+	_remoteControl = [newControl retain];
 }
 
 // delegate method for the MultiClickRemoteBehavior

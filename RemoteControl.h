@@ -74,7 +74,7 @@ typedef enum {
 	Base Interface for Remote Control devices
 */
 @interface RemoteControl : NSObject {
-	id<RemoteControlDelegate> delegate;
+	id<RemoteControlDelegate> _delegate;
 }
 
 // returns nil if the remote control device is not available

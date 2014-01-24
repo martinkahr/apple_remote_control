@@ -3,7 +3,7 @@
  * RemoteControlWrapper
  *
  * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
- * Copyright (c) 2006 martinkahr.com. All rights reserved.
+ * Copyright (c) 2006-2014 martinkahr.com. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -32,9 +32,9 @@
 	The class is not thread safe
 */
 @interface AppleRemote : HIDRemoteControlDevice {
-	BOOL lastSecureEventInputState;
-	io_object_t eventSecureInputNotification;
-	IONotificationPortRef notifyPort;
+	BOOL _lastSecureEventInputState;
+	io_object_t _eventSecureInputNotification;
+	IONotificationPortRef _notifyPort;
 }
 
 - (BOOL) retrieveSecureEventInputState;

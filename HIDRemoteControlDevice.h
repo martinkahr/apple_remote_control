@@ -34,22 +34,22 @@
 	Base class for HID based remote control devices
  */
 @interface HIDRemoteControlDevice : RemoteControl {
-	IOHIDDeviceInterface** hidDeviceInterface;
-	IOHIDQueueInterface**  queue;
-	NSMutableArray*		   allCookies;
-	NSMutableDictionary*   cookieToButtonMapping;
+	IOHIDDeviceInterface** _hidDeviceInterface;
+	IOHIDQueueInterface**  _queue;
+	NSMutableArray*		   _allCookies;
+	NSMutableDictionary*   _cookieToButtonMapping;
 	
 #ifdef __OBJC_GC__
 	// Under GC, CF-type ivars must be explicitly strong;
 	// but under ARC, doing so is not valid.
 	__strong
 #endif
-	CFRunLoopSourceRef	   eventSource;
+	CFRunLoopSourceRef	   _eventSource;
 	
-	BOOL openInExclusiveMode;
-	BOOL processesBacklog;
+	BOOL _openInExclusiveMode;
+	BOOL _processesBacklog;
 	
-	int supportedButtonEvents;
+	int _supportedButtonEvents;
 }
 
 // When your application needs to much time on the main thread when processing an event other events

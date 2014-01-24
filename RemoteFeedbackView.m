@@ -14,62 +14,62 @@
 - (id)initWithFrame:(NSRect)frameRect
 {
 	if ((self = [super initWithFrame:frameRect]) != nil) {
-		remoteImage = [[NSImage imageNamed:@"AppleRemote"] retain];
-		lastButtonIdentifier = -1;
+		_remoteImage = [[NSImage imageNamed:@"AppleRemote"] retain];
+		_lastButtonIdentifier = -1;
 	}
 	return self;
 }
 
 - (void) dealloc {
 
-	[remoteImage release];
+	[_remoteImage release];
 	[super dealloc];
 }
 
 - (void) clearAfterRedraw: (id) sender {
-	lastButtonIdentifier = -1;
+	_lastButtonIdentifier = -1;
 	[self setNeedsDisplay:YES];
 }
 
 - (void) remoteButton: (RemoteControlEventIdentifier)buttonIdentifier pressedDown: (BOOL) pressedDown clickCount: (unsigned int)clickCount {
 	if (pressedDown) {
-		lastButtonIdentifier = buttonIdentifier;
+		_lastButtonIdentifier = buttonIdentifier;
 	} else {
-		if (drawn) {
-			lastButtonIdentifier = -1;
+		if (_drawn) {
+			_lastButtonIdentifier = -1;
 		} else {
-			lastButtonIdentifier = buttonIdentifier;
+			_lastButtonIdentifier = buttonIdentifier;
 			[self performSelector:@selector(clearAfterRedraw:) withObject:self afterDelay:0.1];
 		}
 	}
 		
-	drawn = NO;
+	_drawn = NO;
 	[self setNeedsDisplay:YES];
 }
 
 - (void)drawRect:(NSRect)rect {
-	drawn = YES;
+	_drawn = YES;
 	NSRect imageRect;
 	NSRect drawingRect;
 	imageRect.origin = NSZeroPoint;
-	imageRect.size   = [remoteImage size];
+	imageRect.size   = [_remoteImage size];
 	
-	int x = ([self bounds].size.width  - [remoteImage size].width)/2;
-	int y = ([self bounds].size.height - [remoteImage size].height)/2;
+	int x = ([self bounds].size.width  - [_remoteImage size].width)/2;
+	int y = ([self bounds].size.height - [_remoteImage size].height)/2;
 	
 	drawingRect.origin = NSMakePoint(x, y);
 	drawingRect.size   = imageRect.size;
 	
-	[remoteImage drawInRect: drawingRect
+	[_remoteImage drawInRect: drawingRect
 				   fromRect: imageRect
 				  operation: NSCompositeSourceOver
 				   fraction: 1.0];
 	
-	if (lastButtonIdentifier == -1) {
+	if (_lastButtonIdentifier == -1) {
 		return;
 	}
 	
-	RemoteControlEventIdentifier buttonToSelect = lastButtonIdentifier;
+	RemoteControlEventIdentifier buttonToSelect = _lastButtonIdentifier;
 	
 	NSPoint buttonPos;
 	CGFloat opacity = 0.5;
