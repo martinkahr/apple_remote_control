@@ -130,6 +130,7 @@
 			buttonPos.y = 210;
 			break;
 		default:
+			return;
 			break;
 	}
 	
