@@ -3,7 +3,7 @@
  * RemoteControlWrapper
  *
  * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
- * Copyright (c) 2006 martinkahr.com. All rights reserved.
+ * Copyright (c) 2006-2014 martinkahr.com. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -39,10 +39,15 @@
 	NSMutableArray*		   allCookies;
 	NSMutableDictionary*   cookieToButtonMapping;
 	
-	__strong CFRunLoopSourceRef	   eventSource;
+#ifdef __OBJC_GC__
+	// Under GC, CF-type ivars must be explicitly strong;
+	// but under ARC, doing so is not valid.
+	__strong
+#endif
+	CFRunLoopSourceRef	   eventSource;
 	
 	BOOL openInExclusiveMode;
-	BOOL processesBacklog;	
+	BOOL processesBacklog;
 	
 	int supportedButtonEvents;
 }
