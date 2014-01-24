@@ -3,7 +3,7 @@
  * RemoteControlWrapper
  *
  * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
- * Copyright (c) 2006 martinkahr.com. All rights reserved.
+ * Copyright (c) 2006-2014 martinkahr.com. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -44,12 +44,12 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 // Delegating objects do not (and should not) retain their delegates. 
 // However, clients of delegating objects (applications, usually) are responsible for ensuring that their delegates are around
 // to receive delegation messages. To do this, they may have to retain the delegate.
-- (void) setDelegate: (id) _delegate {
+- (void) setDelegate: (id<MultiClickRemoteBehaviorDelegate>) _delegate {
 	if (_delegate && [_delegate respondsToSelector:@selector(remoteButton:pressedDown:clickCount:)]==NO) return;
 	
 	delegate = _delegate;
 }
-- (id) delegate {
+- (id<MultiClickRemoteBehaviorDelegate>) delegate {
 	return delegate;
 }
 

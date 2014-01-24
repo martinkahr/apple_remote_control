@@ -3,19 +3,19 @@
 //  RemoteControlWrapper
 //
 //  Created by Martin Kahr on 16.03.06.
-//  Copyright 2006 martinkahr.com. All rights reserved.
+//  Copyright 2006-2014 martinkahr.com. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
 
-@class RemoteControl;
-@class MultiClickRemoteBehavior;
+#include "MultiClickRemoteBehavior.h"
+@class RemoteFeedbackView;
 
-@interface MainController : NSObject {
+@interface MainController : NSObject <MultiClickRemoteBehaviorDelegate> {
 	RemoteControl* remoteControl;
 	MultiClickRemoteBehavior* remoteBehavior;
 	
-	IBOutlet NSView*		feedbackView;
+	IBOutlet RemoteFeedbackView*		feedbackView;
 	IBOutlet NSTextField*	feedbackText;
 }
 

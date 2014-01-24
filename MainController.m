@@ -3,7 +3,7 @@
 //  RemoteControlWrapper
 //
 //  Created by Martin Kahr on 16.03.06.
-//  Copyright 2006 martinkahr.com. All rights reserved.
+//  Copyright 2006-2014 martinkahr.com. All rights reserved.
 //
 
 #import "MainController.h"
@@ -28,15 +28,11 @@
 }
 
 - (void) awakeFromNib {
-	AppleRemote* newRemoteControl = [[[AppleRemote alloc] initWithDelegate: self] autorelease];
-	[newRemoteControl setDelegate: self];	
-
-	// OPTIONAL CODE 
 	// The MultiClickRemoteBehavior adds extra functionality.
 	// It works like a middle man between the delegate and the remote control
-	remoteBehavior = [MultiClickRemoteBehavior new];		
+	remoteBehavior = [MultiClickRemoteBehavior new];
 	[remoteBehavior setDelegate: self];
-	[newRemoteControl setDelegate: remoteBehavior];
+	AppleRemote* newRemoteControl = [[[AppleRemote alloc] initWithDelegate: remoteBehavior] autorelease];
 	
 	// set new remote control which will update bindings
 	[self setRemoteControl: newRemoteControl];
