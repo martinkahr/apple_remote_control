@@ -27,6 +27,7 @@
 }
 
 - (void) clearAfterRedraw: (id) sender {
+	(void)sender;
 	_lastButtonIdentifier = -1;
 	[self setNeedsDisplay:YES];
 }
@@ -54,8 +55,8 @@
 	imageRect.origin = NSZeroPoint;
 	imageRect.size   = [_remoteImage size];
 	
-	int x = ([self bounds].size.width  - [_remoteImage size].width)/2;
-	int y = ([self bounds].size.height - [_remoteImage size].height)/2;
+	CGFloat x = round(([self bounds].size.width  - [_remoteImage size].width)/2);
+	CGFloat y = round(([self bounds].size.height - [_remoteImage size].height)/2);
 	
 	drawingRect.origin = NSMakePoint(x, y);
 	drawingRect.size   = imageRect.size;

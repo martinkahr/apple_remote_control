@@ -19,10 +19,12 @@
 }
 
 - (void)applicationWillBecomeActive:(NSNotification *)aNotification {
+	(void)aNotification;
 	NSLog(@"Application will become active - Using remote controls");
 	[_remoteControl startListening: self];
 }
 - (void)applicationWillResignActive:(NSNotification *)aNotification {
+	(void)aNotification;
 	NSLog(@"Application will resign active - Releasing remote controls");
 	[_remoteControl stopListening: self];
 }

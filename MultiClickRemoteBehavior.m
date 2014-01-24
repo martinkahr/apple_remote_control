@@ -114,7 +114,7 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 	NSTimeInterval eventTimePoint = [[values objectAtIndex: 1] doubleValue];
 	
 	BOOL finishedClicking = NO;
-	int finalClickCount = _eventClickCount;	
+	unsigned int finalClickCount = _eventClickCount;
 	
 	@synchronized(self) {
 		finishedClicking = (event != _lastClickCountEvent || eventTimePoint == _lastClickCountEventTime);
