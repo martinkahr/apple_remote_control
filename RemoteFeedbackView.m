@@ -72,7 +72,7 @@
 	RemoteControlEventIdentifier buttonToSelect = lastButtonIdentifier;
 	
 	NSPoint buttonPos;
-	float opacity = 0.5;
+	CGFloat opacity = 0.5;
 	
 	switch(buttonToSelect) {
 		case kRemoteButtonPlus_Hold:
@@ -133,8 +133,8 @@
 			break;
 	}
 	
-	float width = 20.0;
-	float height= 20.0;
+	CGFloat width = 20.0;
+	CGFloat height= 20.0;
     NSRect r = NSMakeRect(buttonPos.x + x - (width/2), buttonPos.y + y - (height/2), width, height);
     NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:r];
 	
