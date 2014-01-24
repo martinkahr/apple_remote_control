@@ -1,3 +1,11 @@
+//
+//  RemoteFeedbackView.m
+//  RemoteControlWrapper
+//
+//  Created by Martin Kahr on 16.03.06.
+//  Copyright 2006-2014 martinkahr.com. All rights reserved.
+//
+
 #import "RemoteFeedbackView.h"
 #import "AppleRemote.h"
 
