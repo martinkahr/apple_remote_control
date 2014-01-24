@@ -3,7 +3,7 @@
 //  RemoteControlWrapper
 //
 //  Created by Martin Kahr on 10.03.06.
-//  Copyright __MyCompanyName__ 2006. All rights reserved.
+//  Copyright (c) 2006-2014 martinkahr.com. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
