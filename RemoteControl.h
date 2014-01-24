@@ -43,7 +43,7 @@ extern NSString* const kTargetApplicationIdentifier;
 
 @class RemoteControl;
 
-typedef enum _RemoteControlEventIdentifier {
+typedef enum {
 	// normal events
 	kRemoteButtonPlus				=1<<1,
 	kRemoteButtonMinus				=1<<2,
