@@ -91,7 +91,7 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 }
 
 + (void) sendDistributedNotification: (NSString*) notificationName targetBundleIdentifier: (NSString*) targetIdentifier {
-	NSString* deviceName = [NSString stringWithCString:[self remoteControlDeviceName] encoding:NSASCIIStringEncoding];
+	NSString* deviceName = [NSString stringWithCString:[self remoteControlDeviceName] encoding:NSUTF8StringEncoding];
 	NSString* bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
 	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 							  deviceName, kRemoteControlDeviceName,
