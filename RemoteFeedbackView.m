@@ -11,6 +11,7 @@
 
 @implementation RemoteFeedbackView
 
+// Designated initializer
 - (id)initWithFrame:(NSRect)frameRect
 {
 	if ((self = [super initWithFrame:frameRect]) != nil) {
@@ -21,7 +22,6 @@
 }
 
 - (void) dealloc {
-
 	[_remoteImage release];
 	[super dealloc];
 }
@@ -33,6 +33,7 @@
 }
 
 - (void) remoteButton: (RemoteControlEventIdentifier)buttonIdentifier pressedDown: (BOOL) pressedDown clickCount: (unsigned int)clickCount {
+	(void)clickCount;
 	if (pressedDown) {
 		_lastButtonIdentifier = buttonIdentifier;
 	} else {
@@ -43,12 +44,13 @@
 			[self performSelector:@selector(clearAfterRedraw:) withObject:self afterDelay:0.1];
 		}
 	}
-		
+	
 	_drawn = NO;
 	[self setNeedsDisplay:YES];
 }
 
 - (void)drawRect:(NSRect)rect {
+	(void)rect;
 	_drawn = YES;
 	NSRect imageRect;
 	NSRect drawingRect;
@@ -77,7 +79,7 @@
 	
 	switch(buttonToSelect) {
 		case kRemoteButtonPlus_Hold:
-			opacity = 0.8;			
+			opacity = 0.8;
 			buttonPos.x = 53;
 			buttonPos.y = 240;
 			break;
@@ -86,23 +88,23 @@
 			buttonPos.y = 240;
 			break;
 		case kRemoteButtonMinus_Hold:
-			opacity = 0.8;						
+			opacity = 0.8;
 			buttonPos.x = 53;
 			buttonPos.y = 180;
 			break;
 		case kRemoteButtonMinus:
 			buttonPos.x = 53;
-			buttonPos.y = 180;			
+			buttonPos.y = 180;
 			break;
 		case kRemoteButtonMenu_Hold:
-			opacity = 0.8;			
+			opacity = 0.8;
 			buttonPos.x = 53;
 			buttonPos.y = 137;
 			break;
 		case kRemoteButtonMenu:
 			buttonPos.x = 53;
 			buttonPos.y = 137;
-			break;			
+			break;
 		case kRemoteButtonPlay_Hold:
 			buttonPos.x = 53;
 			buttonPos.y = 210;
@@ -110,19 +112,19 @@
 			break;
 		case kRemoteButtonPlay:
 			buttonPos.x = 53;
-			buttonPos.y = 210;			
+			buttonPos.y = 210;
 			break;
 		case kRemoteButtonRight_Hold:
 			opacity = 0.8;
 			buttonPos.x = 83;
-			buttonPos.y = 210;	
+			buttonPos.y = 210;
 			break;
 		case kRemoteButtonRight:
 			buttonPos.x = 83;
-			buttonPos.y = 210;	
+			buttonPos.y = 210;
 			break;
 		case kRemoteButtonLeft_Hold:
-			opacity = 0.8;			
+			opacity = 0.8;
 			buttonPos.x = 23;
 			buttonPos.y = 210;
 			break;
@@ -141,7 +143,7 @@
     NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:r];
 	
 	[[NSColor colorWithCalibratedRed:1.0 green:0.0 blue:0.0 alpha:opacity] set];
-    [bp fill];	
+    [bp fill];
 }
 
 @end

@@ -27,7 +27,7 @@
  
 #import "RemoteControl.h"
 
-// notifaction names that are being used to signal that an application wants to
+// notification names that are being used to signal that an application wants to
 // have access to the remote control device or if the application has finished
 // using the remote control device
 NSString* const REQUEST_FOR_REMOTE_CONTROL_NOTIFCATION     = @"mac.remotecontrols.RequestForRemoteControl";
@@ -42,6 +42,7 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 
 @implementation RemoteControl
 
+// Designated initializer
 // returns nil if the remote control device is not available
 - (id) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
 	if ( (self = [super init]) ) {
@@ -90,9 +91,13 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 }
 
 + (void) sendDistributedNotification: (NSString*) notificationName targetBundleIdentifier: (NSString*) targetIdentifier {
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys: [NSString stringWithCString:[self remoteControlDeviceName] encoding:NSASCIIStringEncoding],
-		kRemoteControlDeviceName, [[NSBundle mainBundle] bundleIdentifier], kCFBundleIdentifierKey,
-		targetIdentifier, kTargetApplicationIdentifier, nil];
+	NSString* deviceName = [NSString stringWithCString:[self remoteControlDeviceName] encoding:NSASCIIStringEncoding];
+	NSString* bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
+	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+							  deviceName, kRemoteControlDeviceName,
+							  bundleIdentifier, kCFBundleIdentifierKey,
+							  targetIdentifier, kTargetApplicationIdentifier,
+							  nil];
 	
 	[[NSDistributedNotificationCenter defaultCenter] postNotificationName:notificationName
 																   object:nil

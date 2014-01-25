@@ -1,5 +1,5 @@
 /*****************************************************************************
- * RemoteControlWrapper.m
+ * AppleRemote.m
  * RemoteControlWrapper
  *
  * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
@@ -32,8 +32,7 @@
 #import <IOKit/hid/IOHIDKeys.h>
 #import <IOKit/IOKitLib.h>
 
-static void IOREInterestCallback(
-								 void *			refcon,
+static void IOREInterestCallback(void *			refcon,
 								 io_service_t	service,
 								 uint32_t		messageType,
 								 void *			messageArgument );
@@ -47,21 +46,20 @@ static void IOREInterestCallback(
 	#define NSAppKitVersionNumber10_5 949
 #endif
 
-static const char* AppleRemoteDeviceName = "AppleIRController";
-
 @implementation AppleRemote
 
 + (const char*) remoteControlDeviceName {
-	return AppleRemoteDeviceName;
+	return "AppleIRController";
 }
 
-- (id) initWithDelegate: (id) inRemoteControlDelegate {
+// Designated initializer
+- (id) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
 	if ((self = [super initWithDelegate: inRemoteControlDelegate])) {
-		// A security update in february of 2007 introduced an odd behavior.
+		// A security update in February of 2007 introduced an odd behavior.
 		// Whenever SecureEventInput is activated or deactivated the exclusive access
 		// to the apple remote control device is lost. This leads to very strange behavior where
 		// a press on the Menu button activates FrontRow while your app still gets the event.
-		// A great number of people have complained about this.	
+		// A great number of people have complained about this.
 		//
 		// Finally I found a way to get the state of the SecureEventInput
 		// With that information I regain access to the device each time when the SecureEventInput state
@@ -80,7 +78,9 @@ static const char* AppleRemoteDeviceName = "AppleIRController";
 					kr = IOServiceAddInterestNotification(_notifyPort,
 														  entry,
 														  kIOBusyInterest,
-														  &IOREInterestCallback, self, &_eventSecureInputNotification );
+														  &IOREInterestCallback,
+														  self,
+														  &_eventSecureInputNotification );
 					if (kr != KERN_SUCCESS) {
 						NSLog(@"Error when installing EventSecureInput Notification");
 						IONotificationPortDestroy(_notifyPort);
@@ -114,6 +114,7 @@ static const char* AppleRemoteDeviceName = "AppleIRController";
 	[super dealloc];
 }
 
+#ifdef __OBJC_GC__
 - (void)finalize
 {
 	if (_notifyPort)
@@ -131,6 +132,7 @@ static const char* AppleRemoteDeviceName = "AppleIRController";
 	
 	[super finalize];
 }
+#endif
 
 - (void) setCookieMappingInDictionary: (NSMutableDictionary*) inCookieToButtonMapping	{
 
@@ -173,7 +175,7 @@ static const char* AppleRemoteDeviceName = "AppleIRController";
 		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"35_31_19_18_35_31_19_18_"];
 		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]	forKey:@"19_"];
 	} else {
-		// 10.6.2 Snow Leopard
+		// 10.6.2 Snow Leopard or later
 		// Note: does not work on 10.6.0 and 10.6.1
 		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlus]		forKey:@"33_31_30_21_20_2_"];
 		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMinus]		forKey:@"33_32_30_21_20_2_"];
@@ -283,9 +285,9 @@ static const char* AppleRemoteDeviceName = "AppleIRController";
 	io_registry_entry_t root = IORegistryGetRootEntry( kIOMasterPortDefault );
 	if (root != MACH_PORT_NULL) {
 		CFArrayRef arrayRef = IORegistryEntrySearchCFProperty(root, kIOServicePlane, CFSTR("IOConsoleUsers"), NULL, kIORegistryIterateRecursively);
-		if (arrayRef != NULL) {
+		if (arrayRef) {
 			NSArray* array = (NSArray*)arrayRef;
-			unsigned int i;
+			NSUInteger i;
 			for(i=0; i < [array count]; i++) {
 				NSDictionary* dict = [array objectAtIndex:i];
 				if ([[dict objectForKey: @"kCGSSessionUserNameKey"] isEqual: NSUserName()]) {

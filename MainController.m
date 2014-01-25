@@ -9,6 +9,7 @@
 #import "MainController.h"
 #import "AppleRemote.h"
 #import "MultiClickRemoteBehavior.h"
+#import "RemoteFeedbackView.h"
 
 @implementation MainController 
 
@@ -54,38 +55,38 @@
 	
 	switch(buttonIdentifier) {
 		case kRemoteButtonPlus:
-			buttonName = @"Volume up";			
+			buttonName = @"Volume up";
 			break;
 		case kRemoteButtonMinus:
 			buttonName = @"Volume down";
-			break;			
+			break;
 		case kRemoteButtonMenu:
 			buttonName = @"Menu";
-			break;			
+			break;
 		case kRemoteButtonPlay:
 			buttonName = @"Play";
-			break;			
-		case kRemoteButtonRight:	
+			break;
+		case kRemoteButtonRight:
 			buttonName = @"Right";
-			break;			
+			break;
 		case kRemoteButtonLeft:
 			buttonName = @"Left";
-			break;			
+			break;
 		case kRemoteButtonRight_Hold:
-			buttonName = @"Right holding";	
-			break;	
+			buttonName = @"Right holding";
+			break;
 		case kRemoteButtonLeft_Hold:
-			buttonName = @"Left holding";		
-			break;			
+			buttonName = @"Left holding";
+			break;
 		case kRemoteButtonPlus_Hold:
-			buttonName = @"Volume up holding";	
-			break;				
-		case kRemoteButtonMinus_Hold:			
-			buttonName = @"Volume down holding";	
-			break;				
+			buttonName = @"Volume up holding";
+			break;
+		case kRemoteButtonMinus_Hold:
+			buttonName = @"Volume down holding";
+			break;
 		case kRemoteButtonPlay_Hold:
 			buttonName = @"Play (sleep mode)";
-			break;			
+			break;
 		case kRemoteButtonMenu_Hold:
 			buttonName = @"Menu (long)";
 			break;
@@ -93,22 +94,21 @@
 			buttonName = @"Remote Control Switched";
 			break;
 		default:
-			NSLog(@"Unmapped event for button %d", buttonIdentifier); 
+			NSLog(@"Unmapped event for button %d", buttonIdentifier);
 			break;
 	}
 
 	NSString* clickCountString = @"";
-	if (clickCount > 1) clickCountString = [NSString stringWithFormat: @"%d clicks", clickCount];
+	if (clickCount > 1) clickCountString = [NSString stringWithFormat: @"%u clicks", clickCount];
 	NSString* feedbackString = [NSString stringWithFormat:@"%@ %@ %@", buttonName, pressed, clickCountString];
 	[feedbackText setStringValue:feedbackString];
 	
 	// delegate to view
-	[feedbackView remoteButton:buttonIdentifier pressedDown:pressedDown clickCount: clickCount];
+	[feedbackView remoteButton:buttonIdentifier pressedDown:pressedDown clickCount:clickCount];
 	
 	// print out events
 	NSLog(@"%@", feedbackString);
 	if (pressedDown == NO) printf("\n");
-	
 }
 
 @end
