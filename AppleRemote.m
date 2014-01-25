@@ -38,10 +38,6 @@ static void IOREInterestCallback(void *			refcon,
 								 void *			messageArgument );
 
 
-#ifndef NSAppKitVersionNumber10_4
-	#define NSAppKitVersionNumber10_4 824
-#endif
-
 #ifndef NSAppKitVersionNumber10_5
 	#define NSAppKitVersionNumber10_5 949
 #endif
@@ -148,20 +144,7 @@ static void IOREInterestCallback(void *			refcon,
 		IOObjectRelease(foundRemoteDevice);
 	}
 	
-	if (floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_4) {
-		// 10.4.x Tiger
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlus]		forKey:@"14_12_11_6_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMinus]		forKey:@"14_13_11_6_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu]		forKey:@"14_7_6_14_7_6_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]		forKey:@"14_8_6_14_8_6_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonRight]		forKey:@"14_9_6_14_9_6_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft]		forKey:@"14_10_6_14_10_6_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonRight_Hold]	forKey:@"14_6_4_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft_Hold]	forKey:@"14_6_3_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu_Hold]	forKey:@"14_6_14_6_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"18_14_6_18_14_6_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]	forKey:@"19_"];
-	} else if ((floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_5) || (leopardEmulation)) {
+	if ((floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_5) || (leopardEmulation)) {
 		// 10.5.x Leopard
 		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlus]		forKey:@"31_29_28_19_18_"];
 		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMinus]		forKey:@"31_30_28_19_18_"];
