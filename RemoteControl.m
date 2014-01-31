@@ -51,11 +51,6 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 	return self;
 }
 
-- (void) dealloc {
-	_delegate = nil;
-	[super dealloc];
-}
-
 - (void) setDelegate: (id<RemoteControlDelegate>) value {
 	_delegate = value;
 }
