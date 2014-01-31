@@ -39,13 +39,8 @@
 }
 
 // for bindings access
-- (RemoteControl*) remoteControl {
-	return _remoteControl;
-}
-- (void) setRemoteControl: (RemoteControl*) newControl {
-	[_remoteControl autorelease];
-	_remoteControl = [newControl retain];
-}
+@synthesize remoteControl = _remoteControl;
+@synthesize remoteBehavior = _remoteBehavior;
 
 // delegate method for the MultiClickRemoteBehavior
 - (void) remoteButton: (RemoteControlEventIdentifier)buttonIdentifier pressedDown: (BOOL) pressedDown clickCount: (unsigned int)clickCount

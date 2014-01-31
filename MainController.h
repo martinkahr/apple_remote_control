@@ -19,8 +19,8 @@
 	IBOutlet NSTextField*	feedbackText;
 }
 
-- (RemoteControl*) remoteControl;
-- (void) setRemoteControl: (RemoteControl*) newControl;
+@property (readwrite, retain) RemoteControl* remoteControl;
 
+@property (readwrite, retain) MultiClickRemoteBehavior* remoteBehavior;
 
 @end
