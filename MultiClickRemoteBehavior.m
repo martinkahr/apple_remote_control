@@ -49,12 +49,7 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 	return _delegate;
 }
 
-- (BOOL) simulateHoldEvent {
-	return _simulateHoldEvent;
-}
-- (void) setSimulateHoldEvent: (BOOL) value {
-	_simulateHoldEvent = value;
-}
+@synthesize simulateHoldEvent = _simulateHoldEvent;
 
 - (BOOL) simulatesHoldForButtonIdentifier: (RemoteControlEventIdentifier) identifier remoteControl: (RemoteControl*) remoteControl {
 	// we do that check only for the normal button identifiers as we would check for hold support for hold events instead
@@ -74,19 +69,9 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 	}
 }
 
-- (unsigned int) clickCountEnabledButtons {
-	return _clickCountEnabledButtons;
-}
-- (void) setClickCountEnabledButtons: (unsigned int)value {
-	_clickCountEnabledButtons = value;
-}
+@synthesize clickCountEnabledButtons = _clickCountEnabledButtons;
 
-- (NSTimeInterval) maximumClickCountTimeDifference {
-	return _maximumClickCountTimeDifference;
-}
-- (void) setMaximumClickCountTimeDifference: (NSTimeInterval) timeDiff {
-	_maximumClickCountTimeDifference = timeDiff;
-}
+@synthesize maximumClickCountTimeDifference = _maximumClickCountTimeDifference;
 
 - (void) sendPressedDownEventToMainThread: (NSNumber*) event {
 	[[self delegate] remoteButton:[event intValue] pressedDown:YES clickCount:1];

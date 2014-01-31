@@ -82,14 +82,11 @@ typedef enum {
 // returns nil if the remote control device is not available
 - (id) initWithDelegate: (id<RemoteControlDelegate>) remoteControlDelegate;
 
-- (void) setDelegate: (id<RemoteControlDelegate>) value;
-- (id<RemoteControlDelegate>) delegate;
+@property (readwrite, assign) id<RemoteControlDelegate> delegate;
 
-- (void) setListeningToRemote: (BOOL) value;
-- (BOOL) isListeningToRemote;
+@property (readwrite, getter=isListeningToRemote) BOOL listeningToRemote;
 
-- (BOOL) isOpenInExclusiveMode;
-- (void) setOpenInExclusiveMode: (BOOL) value;
+@property (readwrite, getter=isOpenInExclusiveMode) BOOL openInExclusiveMode;
 
 - (IBAction) startListening: (id) sender;
 - (IBAction) stopListening: (id) sender;

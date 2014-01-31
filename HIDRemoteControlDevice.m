@@ -147,19 +147,9 @@
 	}
 }
 
-- (BOOL) isOpenInExclusiveMode {
-	return _openInExclusiveMode;
-}
-- (void) setOpenInExclusiveMode: (BOOL) value {
-	_openInExclusiveMode = value;
-}
+@synthesize openInExclusiveMode = _openInExclusiveMode;
 
-- (BOOL) processesBacklog {
-	return _processesBacklog;
-}
-- (void) setProcessesBacklog: (BOOL) value {
-	_processesBacklog = value;
-}
+@synthesize processesBacklog = _processesBacklog;
 
 - (void) openRemoteControlDevice {
 	io_object_t hidDevice = [[self class] findRemoteDevice];
