@@ -47,14 +47,14 @@
 	id<MultiClickRemoteBehaviorDelegate> _delegate;
 	
 	// state for simulating plus/minus hold
-	BOOL _simulateHoldEvents;
+	BOOL _simulateHoldEvent;
 	BOOL _lastEventSimulatedHold;
 	RemoteControlEventIdentifier _lastHoldEvent;
 	NSTimeInterval _lastHoldEventTime;
 	
 	// state for multi click
 	unsigned int _clickCountEnabledButtons;
-	NSTimeInterval _maxClickTimeDifference;
+	NSTimeInterval _maximumClickCountTimeDifference;
 	NSTimeInterval _lastClickCountEventTime;
 	RemoteControlEventIdentifier _lastClickCountEvent;
 	unsigned int _eventClickCount;

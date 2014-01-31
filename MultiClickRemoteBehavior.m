@@ -35,7 +35,7 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 // Designated initializer
 - (id) init {
 	if (self = [super init]) {
-		_maxClickTimeDifference = DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE;
+		_maximumClickCountTimeDifference = DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE;
 	}
 	return self;
 }
@@ -50,10 +50,10 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 }
 
 - (BOOL) simulateHoldEvent {
-	return _simulateHoldEvents;
+	return _simulateHoldEvent;
 }
 - (void) setSimulateHoldEvent: (BOOL) value {
-	_simulateHoldEvents = value;
+	_simulateHoldEvent = value;
 }
 
 - (BOOL) simulatesHoldForButtonIdentifier: (RemoteControlEventIdentifier) identifier remoteControl: (RemoteControl*) remoteControl {
@@ -82,10 +82,10 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 }
 
 - (NSTimeInterval) maximumClickCountTimeDifference {
-	return _maxClickTimeDifference;
+	return _maximumClickCountTimeDifference;
 }
 - (void) setMaximumClickCountTimeDifference: (NSTimeInterval) timeDiff {
-	_maxClickTimeDifference = timeDiff;
+	_maximumClickCountTimeDifference = timeDiff;
 }
 
 - (void) sendPressedDownEventToMainThread: (NSNumber*) event {
@@ -168,7 +168,7 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 					_eventClickCount = 1;
 					timeNumber = [NSNumber numberWithDouble:_lastClickCountEventTime];
 					eventNumber= [NSNumber numberWithUnsignedInt:previousEvent];
-					NSTimeInterval diffTime = _maxClickTimeDifference-([NSDate timeIntervalSinceReferenceDate]-_lastHoldEventTime);
+					NSTimeInterval diffTime = _maximumClickCountTimeDifference-([NSDate timeIntervalSinceReferenceDate]-_lastHoldEventTime);
 					[self performSelector: @selector(executeClickCountEvent:) 
 							   withObject: [NSArray arrayWithObjects:eventNumber, timeNumber, nil]
 							   afterDelay: diffTime];
@@ -200,7 +200,7 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 		}
 		[self performSelector: @selector(executeClickCountEvent:)
 				   withObject: [NSArray arrayWithObjects:eventNumber, timeNumber, nil]
-				   afterDelay: _maxClickTimeDifference];
+				   afterDelay: _maximumClickCountTimeDifference];
 	} else {
 		[[self delegate] remoteButton:event pressedDown: pressedDown clickCount:1];
 	}

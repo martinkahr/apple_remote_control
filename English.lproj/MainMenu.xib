@@ -1000,22 +1000,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
-						<string key="label">value: remoteBehavior.simulateHoldEvents</string>
-						<reference key="source" ref="462051679"/>
-						<reference key="destination" ref="982337209"/>
-						<object class="NSNibBindingConnector" key="connector">
-							<reference key="NSSource" ref="462051679"/>
-							<reference key="NSDestination" ref="982337209"/>
-							<string key="NSLabel">value: remoteBehavior.simulateHoldEvents</string>
-							<string key="NSBinding">value</string>
-							<string key="NSKeyPath">remoteBehavior.simulateHoldEvents</string>
-							<int key="NSNibBindingConnectorVersion">2</int>
-						</object>
-					</object>
-					<int key="connectionID">273</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: remoteControl.listeningToRemote</string>
 						<reference key="source" ref="72504764"/>
 						<reference key="destination" ref="982337209"/>
@@ -1041,6 +1025,22 @@
 						<reference key="destination" ref="982337209"/>
 					</object>
 					<int key="connectionID">281</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: remoteBehavior.simulateHoldEvent</string>
+						<reference key="source" ref="462051679"/>
+						<reference key="destination" ref="982337209"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="462051679"/>
+							<reference key="NSDestination" ref="982337209"/>
+							<string key="NSLabel">value: remoteBehavior.simulateHoldEvent</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">remoteBehavior.simulateHoldEvent</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">288</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -1831,7 +1831,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">287</int>
+			<int key="maxID">288</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
