@@ -12,6 +12,7 @@
 @class RemoteFeedbackView;
 
 @interface MainController : NSObject <MultiClickRemoteBehaviorDelegate> {
+@private
 	RemoteControl* _remoteControl;
 	MultiClickRemoteBehavior* _remoteBehavior;
 	

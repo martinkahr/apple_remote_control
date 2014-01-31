@@ -43,6 +43,7 @@
 	Events are generated and send to a delegate
  */
 @interface MultiClickRemoteBehavior : NSObject <RemoteControlDelegate> {
+@private
 	id<MultiClickRemoteBehaviorDelegate> _delegate;
 	
 	// state for simulating plus/minus hold

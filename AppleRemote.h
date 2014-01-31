@@ -32,6 +32,7 @@
 	The class is not thread safe
 */
 @interface AppleRemote : HIDRemoteControlDevice {
+@private
 	BOOL _lastSecureEventInputState;
 	io_object_t _eventSecureInputNotification;
 	IONotificationPortRef _notifyPort;

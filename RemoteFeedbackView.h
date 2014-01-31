@@ -11,6 +11,7 @@
 
 @interface RemoteFeedbackView : NSView
 {
+@private
 	NSImage* _remoteImage;
 	RemoteControlEventIdentifier _lastButtonIdentifier;
 	BOOL _drawn;

@@ -34,6 +34,7 @@
 	Base class for HID based remote control devices
  */
 @interface HIDRemoteControlDevice : RemoteControl {
+@private
 	IOHIDDeviceInterface** _hidDeviceInterface;
 	IOHIDQueueInterface**  _queue;
 	NSMutableArray*		   _allCookies;

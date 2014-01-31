@@ -74,6 +74,7 @@ typedef enum {
 	Base Interface for Remote Control devices
 */
 @interface RemoteControl : NSObject {
+@private
 	id<RemoteControlDelegate> _delegate;
 }
 
