@@ -27,8 +27,8 @@
 
 #import "MultiClickRemoteBehavior.h"
 
-const NSTimeInterval DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE=0.35;
-const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
+static const NSTimeInterval DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE=0.35;
+static const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 
 @implementation MultiClickRemoteBehavior
 
@@ -107,7 +107,7 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 		}
 	}
 	
-	if (finishedClicking) {	
+	if (finishedClicking) {
 		id<MultiClickRemoteBehaviorDelegate> strongDelegate = [self delegate];
 		[strongDelegate remoteButton:event pressedDown: YES clickCount:finalClickCount];
 		// trigger a button release event, too
@@ -145,7 +145,7 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 				RemoteControlEventIdentifier previousEvent = _lastHoldEvent;
 				@synchronized(self) {
 					_lastHoldEvent = 0;
-				}						
+				}
 				
 				// in case click counting is enabled we have to setup the state for that, too
 				if (clickCountingForEvent) {
