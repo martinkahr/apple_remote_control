@@ -121,7 +121,8 @@
 }
 
 - (void) sendRemoteButtonEvent: (RemoteControlEventIdentifier) event pressedDown: (BOOL) pressedDown {
-	[[self delegate] sendRemoteButtonEvent: event pressedDown: pressedDown remoteControl:self];
+	id<RemoteControlDelegate> strongDelegate = [self delegate];
+	[strongDelegate sendRemoteButtonEvent: event pressedDown: pressedDown remoteControl:self];
 }
 
 - (void) setCookieMappingInDictionary: (NSMutableDictionary*) aCookieToButtonMapping {
