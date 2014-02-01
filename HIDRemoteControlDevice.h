@@ -70,7 +70,9 @@
 - (void) openRemoteControlDevice;
 - (void) closeRemoteControlDevice: (BOOL) shallSendNotifications;
 
+// You must call IOObjectRelease() on the returned value when you are done with it.
 + (io_object_t) findRemoteDevice;
+
 + (BOOL) isRemoteAvailable;
 
 @end
