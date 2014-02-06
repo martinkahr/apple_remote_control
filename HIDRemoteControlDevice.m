@@ -92,7 +92,7 @@
 // Designated initializer
 - (id) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
 	if ([[self class] isRemoteAvailable] == NO) {
-		[super dealloc];
+		[self release];
 		self = nil;
 	} else if ( (self = [super initWithDelegate: inRemoteControlDelegate]) ) {
 		_openInExclusiveMode = YES;
