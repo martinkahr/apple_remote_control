@@ -190,7 +190,11 @@ static void IOREInterestCallback(void *			refcon,
 	
 	[super sendRemoteButtonEvent:event pressedDown:pressedDown];
 	
-	if (pressedDown && (event == kRemoteButtonRight || event == kRemoteButtonLeft || event == kRemoteButtonPlay || event == kRemoteButtonMenu || event == kRemoteButtonPlay_Hold)) {
+	if (pressedDown && (event == kRemoteButtonRight ||
+						event == kRemoteButtonLeft ||
+						event == kRemoteButtonPlay ||
+						event == kRemoteButtonMenu ||
+						event == kRemoteButtonPlay_Hold)) {
 		// There is no seperate event when the button is being released. We are simulating that event here
 		[super sendRemoteButtonEvent:event pressedDown:NO];
 	}
