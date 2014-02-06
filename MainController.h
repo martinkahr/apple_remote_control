@@ -6,7 +6,7 @@
 //  Copyright 2006-2014 martinkahr.com. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
 #include "MultiClickRemoteBehavior.h"
 @class RemoteFeedbackView;

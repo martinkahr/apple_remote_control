@@ -25,7 +25,7 @@
  *
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 #import "HIDRemoteControlDevice.h"
 
 /*	Interacts with the Apple Remote Control HID device

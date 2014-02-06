@@ -26,7 +26,7 @@
  *****************************************************************************/
 
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 #import "RemoteControl.h"
 
 /*

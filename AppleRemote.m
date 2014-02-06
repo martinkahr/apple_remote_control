@@ -38,8 +38,8 @@ static void IOREInterestCallback(void *			refcon,
 								 void *			messageArgument );
 
 
-#ifndef NSAppKitVersionNumber10_5
-	#define NSAppKitVersionNumber10_5 949
+#ifndef NSFoundationVersionNumber10_5
+	#define NSFoundationVersionNumber10_5 677.00
 #endif
 
 @implementation AppleRemote
@@ -144,7 +144,7 @@ static void IOREInterestCallback(void *			refcon,
 		IOObjectRelease(foundRemoteDevice);
 	}
 	
-	if ((floor(NSAppKitVersionNumber) <= NSAppKitVersionNumber10_5) || (leopardEmulation)) {
+	if ((floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber10_5) || (leopardEmulation)) {
 		// 10.5.x Leopard
 		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlus]		forKey:@"31_29_28_19_18_"];
 		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMinus]		forKey:@"31_30_28_19_18_"];

@@ -25,7 +25,7 @@
  *
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 #import <IOKit/hid/IOHIDLib.h>
 
 #import "RemoteControl.h"
