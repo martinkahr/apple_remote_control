@@ -137,7 +137,7 @@
 }
 	
 - (BOOL) isListeningToRemote {
-	return (_hidDeviceInterface != NULL && _allCookies != nil && _queue != NULL);
+	return (_hidDeviceInterface != NULL && _allCookies != NULL && _queue != NULL);
 }
 
 - (void) setListeningToRemote: (BOOL) value {
@@ -198,9 +198,9 @@ cleanup:
 		sendNotification = YES;
 	}
 	
-	if (_allCookies != nil) {
-		[_allCookies autorelease];
-		_allCookies = nil;
+	if (_allCookies != NULL) {
+		CFRelease(_allCookies);
+		_allCookies = NULL;
 	}
 	
 	if (_hidDeviceInterface != NULL) {
@@ -212,10 +212,10 @@ cleanup:
 		
 		_hidDeviceInterface = NULL;
 	}
-		
+	
 	if (shallSendNotifications && [self isOpenInExclusiveMode] && sendNotification) {
 		[[self class] sendFinishedNotifcationForAppIdentifier: nil];
-	}		
+	}
 }
 
 - (IBAction) startListening: (id) sender {
@@ -415,14 +415,6 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 
 - (BOOL) initializeCookies {
 	IOHIDDeviceInterface122** handle = (IOHIDDeviceInterface122**)_hidDeviceInterface;
-	IOHIDElementCookie		cookie;
-	//long					usage;
-	//long					usagePage;
-	id						object;
-	CFArrayRef				elements = nil;
-	NSDictionary*			element;
-	IOReturn success;
-	
 	if (!handle || !(*handle)) return NO;
 	
 	// Copy all elements, since we're grabbing most of the elements
@@ -430,32 +422,32 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 	// ourselves. When grabbing only one or two elements, a matching
 	// dictionary should be passed in here instead of NULL.
 	
-	success = (*handle)->copyMatchingElements(handle, NULL, &elements);
+	CFArrayRef elements = NULL;
+	IOReturn success = (*handle)->copyMatchingElements(handle, NULL, &elements);
 	
 	if ( (success == kIOReturnSuccess) && elements ) {
-		_allCookies = [[NSMutableArray alloc] init];
+		_allCookies = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
 		
-		NSEnumerator *elementsEnumerator = [(NSArray*)elements objectEnumerator];
-		
-		while ( (element = [elementsEnumerator nextObject]) ) {
-			//Get cookie
-			object = [element valueForKey: @kIOHIDElementCookieKey ];
-			if (object == nil || ![object isKindOfClass:[NSNumber class]]) continue;
-			if (object == nil || CFGetTypeID(object) != CFNumberGetTypeID()) continue;
-			cookie = (IOHIDElementCookie) [object longValue];
-			
-			//Get usage
-			object = [element valueForKey: @kIOHIDElementUsageKey ];
-			if (object == nil || ![object isKindOfClass:[NSNumber class]]) continue;
-			//usage = [object longValue];
-			
-			//Get usage page
-			object = [element valueForKey: @kIOHIDElementUsagePageKey ];
-			if (object == nil || ![object isKindOfClass:[NSNumber class]]) continue;
-			//usagePage = [object longValue];
-			
-			//It seems wrong to cast a cookie to a 32 bit integer since it is a void*, but in 64 bit it's actually a uint32_t!  So in both 32 and 64 bit it is 32 bit in size.
-			[_allCookies addObject: [NSNumber numberWithUnsignedInt:(uint32_t)cookie]];
+		CFIndex elementsCount = CFArrayGetCount(elements);
+		if (elementsCount > 0) {
+			CFIndex idx;
+			for (idx = 0; idx < elementsCount; idx++) {
+				CFDictionaryRef element = CFArrayGetValueAtIndex(elements, idx);
+				
+				// Get cookie
+				CFNumberRef cookie = CFDictionaryGetValue(element, CFSTR(kIOHIDElementCookieKey));
+				if (cookie == NULL || CFGetTypeID(cookie) != CFNumberGetTypeID()) continue;
+				
+				// Get usage
+				CFNumberRef usage = CFDictionaryGetValue(element, CFSTR(kIOHIDElementUsageKey));
+				if (usage == NULL || CFGetTypeID(usage) != CFNumberGetTypeID()) continue;
+				
+				// Get usage page
+				CFNumberRef usagePage = CFDictionaryGetValue(element, CFSTR(kIOHIDElementUsagePageKey));
+				if (usagePage == NULL || CFGetTypeID(usagePage) != CFNumberGetTypeID()) continue;
+				
+				CFArrayAppendValue(_allCookies, cookie);
+			}
 		}
 		
 		CFRelease(elements);
@@ -478,11 +470,15 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 		if (_queue) {
 			result = (*_queue)->create(_queue, 0, 12);	//depth: maximum number of elements in queue before oldest elements in queue begin to be lost.
 			if (result == kIOReturnSuccess) {
-				IOHIDElementCookie cookie;
-				NSEnumerator *allCookiesEnumerator = [_allCookies objectEnumerator];
-				
-				while ( (cookie = (IOHIDElementCookie)[[allCookiesEnumerator nextObject] unsignedIntValue]) ) {
-					(*_queue)->addElement(_queue, cookie, 0);
+				CFIndex cookiesCount = CFArrayGetCount(_allCookies);
+				if (cookiesCount > 0) {
+					CFIndex idx;
+					for (idx = 0; idx < cookiesCount; idx++) {
+						CFNumberRef cookieRef = CFArrayGetValueAtIndex(_allCookies, idx);
+						IOHIDElementCookie cookie; // Note: this is 32 bit in both 32 & 64 bit ABIs!
+						CFNumberGetValue(cookieRef, kCFNumberSInt32Type, &cookie);
+						(*_queue)->addElement(_queue, cookie, 0);
+					}
 				}
 				
 				// add callback for async events

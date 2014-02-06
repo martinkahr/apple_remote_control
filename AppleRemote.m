@@ -199,17 +199,19 @@ static void IOREInterestCallback(void *			refcon,
 // overridden to handle a special case with old versions of the rb driver
 + (io_object_t) findRemoteDevice
 {
-	CFMutableDictionaryRef hidMatchDictionary = NULL;
-	IOReturn ioReturnValue = kIOReturnSuccess;
-	io_iterator_t hidObjectIterator = 0;
-	io_object_t	hidDevice = 0;
+	// Create a CFString version of the remote name.
+	const char* remoteControlDeviceName = [self remoteControlDeviceName];
+	CFStringRef remoteName = CFStringCreateWithCString(kCFAllocatorDefault, remoteControlDeviceName, kCFStringEncodingUTF8);
+	if (!remoteName) return 0;
 	
 	// Set up a matching dictionary to search the I/O Registry by class
 	// name for all HID class devices
-	hidMatchDictionary = IOServiceMatching([self remoteControlDeviceName]);
+	CFMutableDictionaryRef hidMatchDictionary = IOServiceMatching(remoteControlDeviceName);
 	
 	// Now search I/O Registry for matching devices.
-	ioReturnValue = IOServiceGetMatchingServices(kIOMasterPortDefault, hidMatchDictionary, &hidObjectIterator);
+	io_iterator_t hidObjectIterator = 0;
+	io_object_t	hidDevice = 0;
+	IOReturn ioReturnValue = IOServiceGetMatchingServices(kIOMasterPortDefault, hidMatchDictionary, &hidObjectIterator);
 	
 	if ((ioReturnValue == kIOReturnSuccess) && (hidObjectIterator != 0))
 	{
@@ -228,10 +230,10 @@ static void IOREInterestCallback(void *			refcon,
 					}
 				}
 				
-				CFTypeRef className = IORegistryEntryCreateCFProperty((io_registry_entry_t)matchingService, CFSTR("IOClass"), kCFAllocatorDefault, 0);
+				CFStringRef className = IORegistryEntryCreateCFProperty((io_registry_entry_t)matchingService, CFSTR(kIOClassKey), kCFAllocatorDefault, 0);
 				if (className)
 				{
-					if ([(NSString *)className isEqual:[NSString stringWithUTF8String:[self remoteControlDeviceName]]])
+					if (CFStringCompare(className, remoteName, 0) == kCFCompareEqualTo)
 					{
 						if (foundService)
 						{
@@ -259,6 +261,8 @@ static void IOREInterestCallback(void *			refcon,
 		IOObjectRelease(hidObjectIterator);
 	}
 	
+	CFRelease(remoteName);
+	
 	return hidDevice;
 }
 
@@ -269,12 +273,18 @@ static void IOREInterestCallback(void *			refcon,
 	if (root != MACH_PORT_NULL) {
 		CFArrayRef arrayRef = IORegistryEntrySearchCFProperty(root, kIOServicePlane, CFSTR("IOConsoleUsers"), NULL, kIORegistryIterateRecursively);
 		if (arrayRef) {
-			NSArray* array = (NSArray*)arrayRef;
-			NSUInteger i;
-			for(i=0; i < [array count]; i++) {
-				NSDictionary* dict = [array objectAtIndex:i];
-				if ([[dict objectForKey: @"kCGSSessionUserNameKey"] isEqual: NSUserName()]) {
-					returnValue = ([dict objectForKey:@"kCGSSessionSecureInputPID"] != nil);
+			CFIndex arrayCount = CFArrayGetCount(arrayRef);
+			if (arrayCount > 0) {
+				CFStringRef userName = (CFStringRef)NSUserName();
+				
+				CFIndex i;
+				for (i=0; i < arrayCount; i++) {
+					CFDictionaryRef dict = CFArrayGetValueAtIndex(arrayRef, i);
+					CFStringRef sessionUserName = CFDictionaryGetValue(dict, CFSTR("kCGSSessionUserNameKey"));
+					if (sessionUserName && CFStringCompare(sessionUserName, userName, 0) == kCFCompareEqualTo) {
+						CFTypeRef sessionSecureInputPID = CFDictionaryGetValue(dict, CFSTR("kCGSSessionSecureInputPID"));
+						returnValue = (sessionSecureInputPID != NULL);
+					}
 				}
 			}
 			CFRelease(arrayRef);
@@ -306,7 +316,7 @@ static void IOREInterestCallback(void *			refcon,
 	(void)messageType;
 	(void)messageArgument;
 	
-	// With garbage collection, such a cast is dangerous because the refcon parameter is not strong.  That means that, unless someone has a strong reference somewhere, the AppleRemote may have already been finalized.  But it should be pretty safe in this case, since if the AppleRemote is finalized, the callback is cancelled and should never be invoked.
+	// Such a cast is dangerous but should be pretty safe in this case, since when the AppleRemote is deallocated, the callback is cancelled and this function will thereafter not be invoked.
 	AppleRemote* remote = (AppleRemote*)refcon;
 	
 	[remote dealWithSecureEventInputChange];
