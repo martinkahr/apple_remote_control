@@ -24,8 +24,44 @@
  * THE SOFTWARE.
  *
  *****************************************************************************/
- 
+
 #import <AppKit/AppKit.h>
+
+// __has_feature is new in the 10.7 SDK, define it here if it's not yet defined.
+#ifndef __has_feature
+	#define __has_feature(x) 0
+#endif
+
+// Create handy #defines that indicate the current memory management model.
+#if defined(__OBJC_GC__)
+	#define _isMRR 0
+	#define _isGC 1
+	#define _isARC 0
+#elif __has_feature(objc_arc)
+	#define _isMRR 0
+	#define _isGC 0
+	#define _isARC 1
+#else
+	#define _isMRR 1
+	#define _isGC 0
+	#define _isARC 0
+#endif
+
+// Under GC, CF-type ivars must be explicitly strong;
+// but under ARC, doing so is not valid, and will not compile.
+#if _isGC
+	#define _gcstrong __strong
+#else
+	#define _gcstrong
+#endif
+
+// Under ARC, we sometimes need bridge casts.  Outside ARC they are not needed
+// and are not recognized by older compilers.
+#if _isARC
+	#define _arcbridge __bridge
+#else
+	#define _arcbridge
+#endif
 
 // notification names that are being used to signal that an application wants to
 // have access to the remote control device or if the application has finished

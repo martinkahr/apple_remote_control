@@ -15,16 +15,21 @@
 - (id)initWithFrame:(NSRect)frameRect
 {
 	if ((self = [super initWithFrame:frameRect]) != nil) {
-		_remoteImage = [[NSImage imageNamed:@"AppleRemote"] retain];
+		_remoteImage = [NSImage imageNamed:@"AppleRemote"];
+#if _isMRR
+		[_remoteImage retain];
+#endif
 		_lastButtonIdentifier = -1;
 	}
 	return self;
 }
 
+#if _isMRR
 - (void) dealloc {
 	[_remoteImage release];
 	[super dealloc];
 }
+#endif
 
 - (void) clearAfterRedraw: (id) sender {
 	(void)sender;

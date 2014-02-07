@@ -4,4 +4,4 @@ This Xcode project includes Objective-c source code to interact with the Apple R
 
 # Compatibility
 
-Requires Mac OS X 10.5 or later.  Supports manual memory management and garbage collection (ARC is not supported yet).
+Requires Mac OS X 10.5 or later.  Supports manual memory management, garbage collection, and ARC.

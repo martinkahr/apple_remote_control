@@ -75,7 +75,7 @@ static void IOREInterestCallback(void *			refcon,
 														  entry,
 														  kIOBusyInterest,
 														  &IOREInterestCallback,
-														  self,
+														  (_arcbridge void *)(self),
 														  &_eventSecureInputNotification );
 					if (kr != KERN_SUCCESS) {
 						NSLog(@"Error when installing EventSecureInput Notification");
@@ -93,6 +93,7 @@ static void IOREInterestCallback(void *			refcon,
 	return self;
 }
 
+#if !_isGC
 - (void)dealloc
 {
 	if (_notifyPort)
@@ -107,10 +108,13 @@ static void IOREInterestCallback(void *			refcon,
 		_eventSecureInputNotification = MACH_PORT_NULL;
 	}
 	
+#if _isMRR
 	[super dealloc];
+#endif
 }
+#endif
 
-#ifdef __OBJC_GC__
+#if _isGC
 - (void)finalize
 {
 	if (_notifyPort)
@@ -279,7 +283,7 @@ static void IOREInterestCallback(void *			refcon,
 		if (arrayRef) {
 			CFIndex arrayCount = CFArrayGetCount(arrayRef);
 			if (arrayCount > 0) {
-				CFStringRef userName = (CFStringRef)NSUserName();
+				CFStringRef userName = (_arcbridge CFStringRef)NSUserName();
 				
 				CFIndex i;
 				for (i=0; i < arrayCount; i++) {
@@ -321,7 +325,7 @@ static void IOREInterestCallback(void *			refcon,
 	(void)messageArgument;
 	
 	// Such a cast is dangerous but should be pretty safe in this case, since when the AppleRemote is deallocated, the callback is cancelled and this function will thereafter not be invoked.
-	AppleRemote* remote = (AppleRemote*)refcon;
+	AppleRemote* remote = (_arcbridge AppleRemote*)refcon;
 	
 	[remote dealWithSecureEventInputChange];
 }

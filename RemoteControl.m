@@ -51,7 +51,12 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 	return self;
 }
 
-@synthesize delegate = _delegate;
+- (void) setDelegate:(id<RemoteControlDelegate>)inDelegate {
+	_delegate = inDelegate;
+}
+- (id<RemoteControlDelegate>) delegate {
+	return _delegate;
+}
 
 - (void) setListeningToRemote: (BOOL) value {
 	(void)value;

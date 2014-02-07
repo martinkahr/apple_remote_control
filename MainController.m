@@ -13,11 +13,13 @@
 
 @implementation MainController 
 
+#if _isMRR
 - (void) dealloc {
 	[_remoteControl autorelease];
 	[_remoteBehavior autorelease];
 	[super dealloc];
 }
+#endif
 
 - (void)applicationWillBecomeActive:(NSNotification *)aNotification {
 	(void)aNotification;
@@ -35,10 +37,14 @@
 	// It works like a middle man between the delegate and the remote control
 	_remoteBehavior = [MultiClickRemoteBehavior new];
 	[_remoteBehavior setDelegate: self];
-	AppleRemote* newRemoteControl = [[[AppleRemote alloc] initWithDelegate: _remoteBehavior] autorelease];
+	AppleRemote* newRemoteControl = [[AppleRemote alloc] initWithDelegate: _remoteBehavior];
 	
 	// set new remote control which will update bindings
 	[self setRemoteControl: newRemoteControl];
+	
+#if _isMRR
+	[newRemoteControl autorelease];
+#endif
 }
 
 // for bindings access

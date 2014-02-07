@@ -30,14 +30,6 @@
 
 #import "RemoteControl.h"
 
-// Under GC, CF-type ivars must be explicitly strong;
-// but under ARC, doing so is not valid, and will not compile.
-#ifdef __OBJC_GC__
-	#define _gcstrong __strong
-#else
-	#define _gcstrong
-#endif
-
 /*
 	Base class for HID based remote control devices
  */
