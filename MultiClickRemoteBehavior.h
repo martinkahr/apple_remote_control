@@ -64,12 +64,12 @@
 - (id) init;
 
 // Delegates are not retained
-@property (readwrite, assign) id<MultiClickRemoteBehaviorDelegate> delegate;
+@property (readwrite, assign, nonatomic) id<MultiClickRemoteBehaviorDelegate> delegate;
 
 // Simulating hold events does deactivate sending of individual requests for pressed down/released.
 // Instead special hold events are being triggered when the user is pressing and holding a button for a small period.
 // Simulation is activated only for those buttons and remote control that do not have a seperate event already
-@property (readwrite) BOOL simulateHoldEvent;
+@property (readwrite, nonatomic) BOOL simulateHoldEvent;
 
 // click counting makes it possible to recognize if the user has pressed a button repeatedly
 // click counting does delay each event as it has to wait if there is another event (second click)
@@ -77,11 +77,11 @@
 // of the user and the call of your delegate method
 // click counting can be enabled individually for specific buttons. Use the property clickCountEnableButtons to
 // set the buttons for which click counting shall be enabled
-@property (readwrite) BOOL clickCountingEnabled;
+@property (readwrite, nonatomic) BOOL clickCountingEnabled;
 
-@property (readwrite) unsigned int clickCountEnabledButtons;
+@property (readwrite, nonatomic) unsigned int clickCountEnabledButtons;
 
 // the maximum time difference till which clicks are recognized as multi clicks
-@property (readwrite) NSTimeInterval maximumClickCountTimeDifference;
+@property (readwrite, nonatomic) NSTimeInterval maximumClickCountTimeDifference;
 
 @end

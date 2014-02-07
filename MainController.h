@@ -20,8 +20,8 @@
 	IBOutlet NSTextField*	feedbackText;
 }
 
-@property (readwrite, retain) RemoteControl* remoteControl;
+@property (readwrite, retain, nonatomic) RemoteControl* remoteControl;
 
-@property (readwrite, retain) MultiClickRemoteBehavior* remoteBehavior;
+@property (readwrite, retain, nonatomic) MultiClickRemoteBehavior* remoteBehavior;
 
 @end

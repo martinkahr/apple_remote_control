@@ -60,7 +60,7 @@
 // may already be received which are put on a backlog. As soon as your main thread
 // has some spare time this backlog is processed and may flood your delegate with calls.
 // Backlog processing is turned off by default.
-@property (readwrite) BOOL processesBacklog;
+@property (readwrite, nonatomic) BOOL processesBacklog;
 
 // methods that should be overridden by subclasses
 - (void) setCookieMappingInDictionary: (NSMutableDictionary*) cookieToButtonMapping;
