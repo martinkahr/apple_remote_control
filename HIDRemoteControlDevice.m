@@ -3,7 +3,7 @@
  * RemoteControlWrapper
  *
  * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
- * Copyright (c) 2006-2014 martinkahr.com. All rights reserved.
+ * Copyright (c) 2006-2016 martinkahr.com. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -77,10 +77,9 @@
 	// Now search I/O Registry for matching devices.
 	ioReturnValue = IOServiceGetMatchingServices(kIOMasterPortDefault, hidMatchDictionary, &hidObjectIterator);
 	
-	if (hidObjectIterator != 0) {
-		if (ioReturnValue == kIOReturnSuccess) {
-			hidDevice = IOIteratorNext(hidObjectIterator);
-		}
+	if ((ioReturnValue == kIOReturnSuccess) && (hidObjectIterator != 0)) {
+		hidDevice = IOIteratorNext(hidObjectIterator);
+
 		// release the iterator
 		IOObjectRelease(hidObjectIterator);
 	}
