@@ -520,7 +520,11 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 		} else {
 			NSLog(@"Error when opening device");
 		}
-	} else if (ioReturnValue == kIOReturnExclusiveAccess) {
+	} else if (ioReturnValue == (IOReturn)0xE00002C5 /* kIOReturnExclusiveAccess */) {
+		// Alas, the kIOReturnExclusiveAccess macro performs undefined bit shifts,
+		// as warned by -Wshift-sign-overflow. At runtime, under UBSan, this can crash
+		// so we hardcode the numeric value and cast. <rdar://12665902>
+		
 		// the device is used exclusive by another application
 		
 		// 1. we register for the FINISHED_USING_REMOTE_CONTROL_NOTIFICATION notification
