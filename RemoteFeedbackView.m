@@ -69,9 +69,13 @@
 	drawingRect.size   = imageRect.size;
 	
 	[_remoteImage drawInRect: drawingRect
-				   fromRect: imageRect
-				  operation: NSCompositeSourceOver
-				   fraction: 1.0];
+					fromRect: imageRect
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 101200
+				   operation: NSCompositingOperationSourceOver
+#else
+				   operation: NSCompositeSourceOver
+#endif
+					fraction: 1.0];
 	
 	if (_lastButtonIdentifier == kRemoteButtonInvalid) {
 		return;
