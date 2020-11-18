@@ -303,7 +303,7 @@ cleanup:
 		RemoteControlEventIdentifier remoteControlEvent = (RemoteControlEventIdentifier)[buttonId intValue];
 		[self sendRemoteButtonEvent: remoteControlEvent pressedDown: (sumOfValues>0)];
 	} else {
-		// let's see if this is the first event after a restart of the OS.
+		// let's see if this is the first event after a restart of the OS, or the first from this remote after a different one was used.
 		// In this case the event has a prefix that we can ignore and we just get the down event but no up event
 		NSEnumerator* keyEnum = [[self cookieToButtonMapping] keyEnumerator];
 		NSString* key;
@@ -313,10 +313,15 @@ cleanup:
 				buttonId = [[self cookieToButtonMapping] objectForKey: key];
 				if (buttonId != nil) {
 					RemoteControlEventIdentifier remoteControlEvent = (RemoteControlEventIdentifier)[buttonId intValue];
-					[self sendRemoteButtonEvent: remoteControlEvent pressedDown: YES];
-					[self sendRemoteButtonEvent: remoteControlEvent pressedDown: NO];
-					return;
+					
+					// In the AppleRemote subclass the sendRemoteButtonEvent:pressedDown: does some extra magic that
+					// results in the delegate being called exactly once or twice, but here we always want exactly twice:
+					// firist pressedDown:YES then pressedDown:NO, so just message the delegate directly.
+					id<RemoteControlDelegate> strongDelegate = [self delegate];
+					[strongDelegate sendRemoteButtonEvent: remoteControlEvent pressedDown: YES remoteControl:self];
+					[strongDelegate sendRemoteButtonEvent: remoteControlEvent pressedDown: NO remoteControl:self];
 				}
+				
 				return;
 			}
 		}

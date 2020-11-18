@@ -179,6 +179,11 @@ static void IOREInterestCallback(void *			refcon,
 }
 
 - (void) sendRemoteButtonEvent: (RemoteControlEventIdentifier) event pressedDown: (BOOL) pressedDown {
+	
+	// the below calls super either:
+	// - exactly once: with given pressedDown
+	// - exactly twice: first with YES, then with NO
+	
 	if (pressedDown == NO && event == kRemoteButtonMenu_Hold) {
 		// There is no seperate event for pressed down on menu hold. We are simulating that event here
 		[super sendRemoteButtonEvent:event pressedDown:YES];
