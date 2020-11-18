@@ -19,7 +19,7 @@
 #if _isMRR
 		[_remoteImage retain];
 #endif
-		_lastButtonIdentifier = -1;
+		_lastButtonIdentifier = kRemoteButtonInvalid;
 	}
 	return self;
 }
@@ -33,7 +33,7 @@
 
 - (void) clearAfterRedraw: (id) sender {
 	(void)sender;
-	_lastButtonIdentifier = -1;
+	_lastButtonIdentifier = kRemoteButtonInvalid;
 	[self setNeedsDisplay:YES];
 }
 
@@ -43,7 +43,7 @@
 		_lastButtonIdentifier = buttonIdentifier;
 	} else {
 		if (_drawn) {
-			_lastButtonIdentifier = -1;
+			_lastButtonIdentifier = kRemoteButtonInvalid;
 		} else {
 			_lastButtonIdentifier = buttonIdentifier;
 			[self performSelector:@selector(clearAfterRedraw:) withObject:self afterDelay:0.1];
@@ -73,7 +73,7 @@
 				  operation: NSCompositeSourceOver
 				   fraction: 1.0];
 	
-	if (_lastButtonIdentifier == -1) {
+	if (_lastButtonIdentifier == kRemoteButtonInvalid) {
 		return;
 	}
 	

@@ -53,7 +53,7 @@
 	NSTimeInterval _lastHoldEventTime;
 	
 	// state for multi click
-	unsigned int _clickCountEnabledButtons;
+	RemoteControlEventIdentifier _clickCountEnabledButtons;
 	NSTimeInterval _maximumClickCountTimeDifference;
 	NSTimeInterval _lastClickCountEventTime;
 	RemoteControlEventIdentifier _lastClickCountEvent;
@@ -82,7 +82,7 @@
 // set the buttons for which click counting shall be enabled
 @property (readwrite, nonatomic) BOOL clickCountingEnabled;
 
-@property (readwrite, nonatomic) unsigned int clickCountEnabledButtons;
+@property (readwrite, nonatomic) RemoteControlEventIdentifier clickCountEnabledButtons;
 
 // the maximum time difference till which clicks are recognized as multi clicks
 @property (readwrite, nonatomic) NSTimeInterval maximumClickCountTimeDifference;
