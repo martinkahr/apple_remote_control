@@ -28,6 +28,8 @@
 #import <AppKit/AppKit.h>
 #import "HIDRemoteControlDevice.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*	Interacts with the Apple Remote Control HID device
 	The class is not thread safe
 */
@@ -41,3 +43,6 @@
 - (BOOL) retrieveSecureEventInputState;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

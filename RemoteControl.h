@@ -63,6 +63,8 @@
 	#define _arcbridge
 #endif
 
+NS_ASSUME_NONNULL_BEGIN
+
 // notification names that are being used to signal that an application wants to
 // have access to the remote control device or if the application has finished
 // using the remote control device
@@ -118,12 +120,12 @@ typedef enum : int {
 
 // Designated initializer
 // returns nil if the remote control device is not available
-- (instancetype) initWithDelegate: (id<RemoteControlDelegate>) remoteControlDelegate NS_DESIGNATED_INITIALIZER;
+- (nullable instancetype) initWithDelegate: (nullable id<RemoteControlDelegate>) remoteControlDelegate NS_DESIGNATED_INITIALIZER;
 
 #if _isMRR
-@property (readwrite, assign, nonatomic) id<RemoteControlDelegate> delegate;
+@property (readwrite, assign, nonatomic, nullable) id<RemoteControlDelegate> delegate;
 #else
-@property (readwrite, weak, nonatomic) id<RemoteControlDelegate> delegate;
+@property (readwrite, weak, nonatomic, nullable) id<RemoteControlDelegate> delegate;
 #endif
 
 // KVO observable.
@@ -139,10 +141,13 @@ typedef enum : int {
 - (BOOL) sendsEventForButtonIdentifier: (RemoteControlEventIdentifier) identifier;
 
 // sending of notifications between applications
-+ (void) sendFinishedNotifcationForAppIdentifier: (NSString*) identifier;
++ (void) sendFinishedNotifcationForAppIdentifier: (nullable NSString*) identifier;
 + (void) sendRequestForRemoteControlNotification;
 
 // name of the device (corresponding to kIOClassKey)
 + (const char*) remoteControlDeviceName;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

@@ -9,6 +9,8 @@
 #import <AppKit/AppKit.h>
 #import "AppleRemote.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface RemoteFeedbackView : NSView
 {
 @private
@@ -20,3 +22,6 @@
 - (void) remoteButton: (RemoteControlEventIdentifier)buttonIdentifier pressedDown: (BOOL) pressedDown clickCount: (unsigned int)clickCount;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

@@ -44,7 +44,7 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 
 // Designated initializer
 // returns nil if the remote control device is not available
-- (instancetype) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
+- (nullable instancetype) initWithDelegate: (nullable id<RemoteControlDelegate>) inRemoteControlDelegate {
 	if ( (self = [super init]) ) {
 		_delegate = inRemoteControlDelegate;
 	}
@@ -58,10 +58,10 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 	return nil;
 }
 
-- (void) setDelegate:(id<RemoteControlDelegate>)inDelegate {
+- (void) setDelegate:(nullable id<RemoteControlDelegate>)inDelegate {
 	_delegate = inDelegate;
 }
-- (id<RemoteControlDelegate>) delegate {
+- (nullable id<RemoteControlDelegate>) delegate {
 	return _delegate;
 }
 
@@ -91,14 +91,15 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 	return YES;
 }
 
-+ (void) sendDistributedNotification: (NSString*) notificationName targetBundleIdentifier: (NSString*) targetIdentifier {
++ (void) sendDistributedNotification: (NSString*) notificationName targetBundleIdentifier: (nullable NSString*) targetIdentifier {
+	assert(notificationName);
 	const char* deviceName = [self remoteControlDeviceName];
 	NSString* bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
 	if (deviceName && bundleIdentifier) {
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 								  [NSString stringWithUTF8String:deviceName], kRemoteControlDeviceName,
 								  bundleIdentifier, kCFBundleIdentifierKey,
-								  targetIdentifier, kTargetApplicationIdentifier,
+								  targetIdentifier, kTargetApplicationIdentifier, // can be nil
 								  nil];
 		
 		[[NSDistributedNotificationCenter defaultCenter] postNotificationName:notificationName
@@ -108,7 +109,7 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 	}
 }
 
-+ (void) sendFinishedNotifcationForAppIdentifier: (NSString*) identifier {
++ (void) sendFinishedNotifcationForAppIdentifier: (nullable NSString*) identifier {
 	[self sendDistributedNotification:FINISHED_USING_REMOTE_CONTROL_NOTIFICATION targetBundleIdentifier:identifier];
 }
 + (void) sendRequestForRemoteControlNotification {
@@ -116,7 +117,7 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 }
 
 + (const char*) remoteControlDeviceName {
-	return NULL;
+	return "";
 }
 
 @end

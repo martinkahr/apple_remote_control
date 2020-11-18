@@ -45,7 +45,7 @@ static void IOREInterestCallback(void *			refcon,
 }
 
 // Designated initializer
-- (instancetype) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
+- (nullable instancetype) initWithDelegate: (nullable id<RemoteControlDelegate>) inRemoteControlDelegate {
 	if ((self = [super initWithDelegate: inRemoteControlDelegate])) {
 		// A security update in February of 2007 introduced an odd behavior.
 		// Whenever SecureEventInput is activated or deactivated the exclusive access
@@ -127,7 +127,8 @@ static void IOREInterestCallback(void *			refcon,
 #endif
 
 - (void) setCookieMappingInDictionary: (NSMutableDictionary*) inCookieToButtonMapping	{
-
+	assert(inCookieToButtonMapping);
+	
 	// check if we are using the rb device driver instead of the one from Apple
 	io_object_t foundRemoteDevice = [[self class] findRemoteDevice];
 	Boolean leopardEmulation = false;

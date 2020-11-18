@@ -89,7 +89,7 @@
 }
 
 // Designated initializer
-- (instancetype) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
+- (nullable instancetype) initWithDelegate: (nullable id<RemoteControlDelegate>) inRemoteControlDelegate {
 	if ([[self class] isRemoteAvailable] == NO) {
 #if _isMRR
 		[self release];
@@ -132,6 +132,7 @@
 }
 
 - (void) setCookieMappingInDictionary: (NSMutableDictionary*) aCookieToButtonMapping {
+	assert(aCookieToButtonMapping);
 	(void)aCookieToButtonMapping;
 }
 - (int) remoteIdSwitchCookie {
@@ -289,6 +290,7 @@ cleanup:
 }
 
 - (void) handleEventWithCookieString: (NSString*) cookieString sumOfValues: (SInt32) sumOfValues {
+	assert(cookieString);
 	/*
 	if (previousRemainingCookieString) {
 		cookieString = [previousRemainingCookieString stringByAppendingString: cookieString];
@@ -357,6 +359,7 @@ cleanup:
 }
 
 - (void) remoteControlAvailable:(NSNotification *)notification {
+	assert(notification);
 	(void)notification;
 	[self removeNotifcationObserver];
 	[self startListening: self];

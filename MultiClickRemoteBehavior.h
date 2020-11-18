@@ -29,6 +29,8 @@
 #import <AppKit/AppKit.h>
 #import "RemoteControl.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*
  * Method definitions for the delegate of the MultiClickRemoteBehavior class
  */
@@ -65,9 +67,9 @@
 - (instancetype) init NS_DESIGNATED_INITIALIZER;
 
 #if _isMRR
-@property (readwrite, assign, nonatomic) id<MultiClickRemoteBehaviorDelegate> delegate;
+@property (readwrite, assign, nonatomic, nullable) id<MultiClickRemoteBehaviorDelegate> delegate;
 #else
-@property (readwrite, weak, nonatomic) id<MultiClickRemoteBehaviorDelegate> delegate;
+@property (readwrite, weak, nonatomic, nullable) id<MultiClickRemoteBehaviorDelegate> delegate;
 #endif
 
 // Simulating hold events does deactivate sending of individual requests for pressed down/released.
@@ -89,3 +91,6 @@
 @property (readwrite, nonatomic) NSTimeInterval maximumClickCountTimeDifference;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

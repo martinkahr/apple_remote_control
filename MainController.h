@@ -9,6 +9,9 @@
 #import <AppKit/AppKit.h>
 
 #include "MultiClickRemoteBehavior.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
 @class RemoteFeedbackView;
 
 @interface MainController : NSObject <MultiClickRemoteBehaviorDelegate> {
@@ -20,8 +23,11 @@
 	IBOutlet NSTextField*	feedbackText;
 }
 
-@property (readwrite, retain, nonatomic) RemoteControl* remoteControl;
+@property (readwrite, retain, nonatomic, nullable) RemoteControl* remoteControl;
 
 @property (readwrite, retain, nonatomic) MultiClickRemoteBehavior* remoteBehavior;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

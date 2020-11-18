@@ -40,20 +40,22 @@ static const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 	return self;
 }
 
-- (void) setDelegate: (id<MultiClickRemoteBehaviorDelegate>) inDelegate {
+- (void) setDelegate: (nullable id<MultiClickRemoteBehaviorDelegate>) inDelegate {
 	if (inDelegate && [inDelegate respondsToSelector:@selector(remoteButton:pressedDown:clickCount:)]==NO) {
 		return;
 	}
 	
 	_delegate = inDelegate;
 }
-- (id<MultiClickRemoteBehaviorDelegate>) delegate {
+- (nullable id<MultiClickRemoteBehaviorDelegate>) delegate {
 	return _delegate;
 }
 
 @synthesize simulateHoldEvent = _simulateHoldEvent;
 
 - (BOOL) simulatesHoldForButtonIdentifier: (RemoteControlEventIdentifier) identifier remoteControl: (RemoteControl*) remoteControl {
+	assert(remoteControl);
+	
 	// we do that check only for the normal button identifiers as we would check for hold support for hold events instead
 	if (identifier > (1 << EVENT_TO_HOLD_EVENT_OFFSET)) {
 		return NO;
@@ -78,11 +80,13 @@ static const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 @synthesize maximumClickCountTimeDifference = _maximumClickCountTimeDifference;
 
 - (void) sendPressedDownEventToMainThread: (NSNumber*) event {
+	assert(event);
 	id<MultiClickRemoteBehaviorDelegate> strongDelegate = [self delegate];
 	[strongDelegate remoteButton:[event intValue] pressedDown:YES clickCount:1];
 }
 
 - (void) sendSimulatedHoldEvent: (NSNumber*) time {
+	assert(time);
 	BOOL startSimulateHold = NO;
 	RemoteControlEventIdentifier event = _lastHoldEvent;
 	@synchronized(self) {
@@ -96,6 +100,7 @@ static const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 }
 
 - (void) executeClickCountEvent: (NSArray*) values {
+	assert(values);
 	RemoteControlEventIdentifier event = [[values objectAtIndex: 0] intValue];
 	NSTimeInterval eventTimePoint = [[values objectAtIndex: 1] doubleValue];
 	
@@ -121,6 +126,8 @@ static const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 }
 
 - (void) sendRemoteButtonEvent: (RemoteControlEventIdentifier) event pressedDown: (BOOL) pressedDown remoteControl: (RemoteControl*) remoteControl {
+	assert(remoteControl);
+	
 	id<MultiClickRemoteBehaviorDelegate> strongDelegate = [self delegate];
 	if (!strongDelegate) {
 		return;

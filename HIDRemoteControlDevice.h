@@ -30,6 +30,8 @@
 
 #import "RemoteControl.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /*
 	Base class for HID based remote control devices
  */
@@ -71,3 +73,6 @@
 + (BOOL) isRemoteAvailable;
 
 @end
+
+NS_ASSUME_NONNULL_END
+
