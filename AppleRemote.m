@@ -270,8 +270,7 @@ static void IOREInterestCallback(void *			refcon,
 			if (arrayCount > 0) {
 				CFStringRef userName = (_arcbridge CFStringRef)NSUserName();
 				
-				CFIndex i;
-				for (i=0; i < arrayCount; i++) {
+				for (CFIndex i=0; i < arrayCount; i++) {
 					CFDictionaryRef dict = CFArrayGetValueAtIndex(arrayRef, i);
 					CFStringRef sessionUserName = CFDictionaryGetValue(dict, CFSTR("kCGSSessionUserNameKey"));
 					if (sessionUserName && CFStringCompare(sessionUserName, userName, 0) == kCFCompareEqualTo) {

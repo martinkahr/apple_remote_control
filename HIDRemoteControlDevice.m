@@ -408,21 +408,18 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 @implementation HIDRemoteControlDevice (IOKitMethods)
 
 - (IOHIDDeviceInterface**) createInterfaceForDevice: (io_object_t) hidDevice {
-	io_name_t				className;
-	IOCFPlugInInterface**   plugInInterface = NULL;
-	HRESULT					plugInResult = S_OK;
-	SInt32					score = 0;
-	IOReturn				ioReturnValue = kIOReturnSuccess;
-	
 	_hidDeviceInterface = NULL;
 	
-	ioReturnValue = IOObjectGetClass(hidDevice, className);
+	io_name_t className;
+	IOReturn ioReturnValue = IOObjectGetClass(hidDevice, className);
 	
 	if (ioReturnValue != kIOReturnSuccess) {
 		NSLog(@"Error: Failed to get class name.");
 		return NULL;
 	}
 	
+	IOCFPlugInInterface** plugInInterface = NULL;
+	SInt32 score = 0;
 	ioReturnValue = IOCreatePlugInInterfaceForService(hidDevice,
 													  kIOHIDDeviceUserClientTypeID,
 													  kIOCFPlugInInterfaceID,
@@ -430,7 +427,7 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 													  &score);
 	if (ioReturnValue == kIOReturnSuccess) {
 		//Call a method of the intermediate plug-in to create the device interface
-		plugInResult = (*plugInInterface)->QueryInterface(plugInInterface, CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID), (LPVOID) &_hidDeviceInterface);
+		HRESULT plugInResult = (*plugInInterface)->QueryInterface(plugInInterface, CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID), (LPVOID) &_hidDeviceInterface);
 		
 		if (plugInResult != S_OK) {
 			NSLog(@"Error: Couldn't create HID class device interface");
@@ -462,8 +459,7 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 		
 		CFIndex elementsCount = CFArrayGetCount(elements);
 		if (elementsCount > 0) {
-			CFIndex idx;
-			for (idx = 0; idx < elementsCount; idx++) {
+			for (CFIndex idx = 0; idx < elementsCount; idx++) {
 				CFDictionaryRef element = CFArrayGetValueAtIndex(elements, idx);
 				
 				// Get cookie
@@ -497,8 +493,6 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 }
 
 - (BOOL) openDevice {
-	HRESULT  result;
-	
 	IOHIDOptionsType openMode = kIOHIDOptionsTypeNone;
 	if ([self isOpenInExclusiveMode]) {
 		openMode = kIOHIDOptionsTypeSeizeDevice;
@@ -508,12 +502,11 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 	if (ioReturnValue == KERN_SUCCESS) {
 		_queue = (*_hidDeviceInterface)->allocQueue(_hidDeviceInterface);
 		if (_queue) {
-			result = (*_queue)->create(_queue, 0, 12);	//depth: maximum number of elements in queue before oldest elements in queue begin to be lost.
+			HRESULT result = (*_queue)->create(_queue, 0, 12);	//depth: maximum number of elements in queue before oldest elements in queue begin to be lost.
 			if (result == kIOReturnSuccess) {
 				CFIndex cookiesCount = CFArrayGetCount(_allCookies);
 				if (cookiesCount > 0) {
-					CFIndex idx;
-					for (idx = 0; idx < cookiesCount; idx++) {
+					for (CFIndex idx = 0; idx < cookiesCount; idx++) {
 						CFNumberRef cookieRef = CFArrayGetValueAtIndex(_allCookies, idx);
 						IOHIDElementCookie cookie; // Note: this is 32 bit in both 32 & 64 bit ABIs!
 						CFNumberGetValue(cookieRef, kCFNumberSInt32Type, &cookie);
