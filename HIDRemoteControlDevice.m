@@ -119,7 +119,8 @@
 	[self removeNotifcationObserver];
 	[self stopListening:self];
 #if _isMRR
-	[_cookieToButtonMapping release]; _cookieToButtonMapping = nil;
+	[_cookieToButtonMapping release];
+	_cookieToButtonMapping = nil;
 	[super dealloc];
 #endif
 }
@@ -341,7 +342,7 @@ cleanup:
 			// process the last event of the backlog and assume that the button is not pressed down any longer.
 			// The events in the backlog do not seem to be in order and therefore (in rare cases) the last event might be 
 			// a button pressed down event while in reality the user has released it.
-			// NSLog(@"processing last event of backlog");
+			// NSLog(@"processing last event of backlog: %@", lastSubCookieString);
 			[self handleEventWithCookieString: lastSubCookieString sumOfValues:0];
 		}
 		if ([cookieString length] > 0) {

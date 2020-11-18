@@ -35,7 +35,7 @@
 - (void) awakeFromNib {
 	// The MultiClickRemoteBehavior adds extra functionality.
 	// It works like a middle man between the delegate and the remote control
-	_remoteBehavior = [MultiClickRemoteBehavior new];
+	_remoteBehavior = [[MultiClickRemoteBehavior alloc] init];
 	[_remoteBehavior setDelegate: self];
 	AppleRemote* newRemoteControl = [[AppleRemote alloc] initWithDelegate: _remoteBehavior];
 	
@@ -55,7 +55,7 @@
 - (void) remoteButton: (RemoteControlEventIdentifier)buttonIdentifier pressedDown: (BOOL) pressedDown clickCount: (unsigned int)clickCount
 {
 	NSString* buttonName=nil;
-	NSString* pressed=@"";
+	NSString* pressed=nil;
 	
 	if (pressedDown) {
 		pressed = @"(pressed)";

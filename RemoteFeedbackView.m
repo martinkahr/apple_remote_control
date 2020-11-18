@@ -62,8 +62,8 @@
 	imageRect.origin = NSZeroPoint;
 	imageRect.size   = [_remoteImage size];
 	
-	CGFloat x = round(([self bounds].size.width  - [_remoteImage size].width)/2);
-	CGFloat y = round(([self bounds].size.height - [_remoteImage size].height)/2);
+	CGFloat x = round(([self bounds].size.width  - [_remoteImage size].width)/2.0);
+	CGFloat y = round(([self bounds].size.height - [_remoteImage size].height)/2.0);
 	
 	drawingRect.origin = NSMakePoint(x, y);
 	drawingRect.size   = imageRect.size;
@@ -148,7 +148,7 @@
 	
 	CGFloat width = 20.0;
 	CGFloat height= 20.0;
-    NSRect r = NSMakeRect(buttonPos.x + x - (width/2), buttonPos.y + y - (height/2), width, height);
+    NSRect r = NSMakeRect(buttonPos.x + x - (width/2.0), buttonPos.y + y - (height/2.0), width, height);
     NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:r];
 	
 	[[NSColor colorWithCalibratedRed:1.0 green:0.0 blue:0.0 alpha:opacity] set];

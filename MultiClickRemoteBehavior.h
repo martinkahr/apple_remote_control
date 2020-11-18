@@ -34,6 +34,7 @@
  */
 @protocol MultiClickRemoteBehaviorDelegate <NSObject>
 
+@required
 - (void) remoteButton: (RemoteControlEventIdentifier)buttonIdentifier pressedDown: (BOOL) pressedDown clickCount: (unsigned int) count;
 
 @end

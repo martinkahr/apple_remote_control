@@ -126,8 +126,10 @@ typedef enum : int {
 @property (readwrite, weak, nonatomic) id<RemoteControlDelegate> delegate;
 #endif
 
+// KVO observable.
 @property (readwrite, getter=isListeningToRemote, nonatomic) BOOL listeningToRemote;
 
+// KVO observable.
 @property (readwrite, getter=isOpenInExclusiveMode, nonatomic) BOOL openInExclusiveMode;
 
 - (IBAction) startListening: (id) sender;
@@ -140,7 +142,7 @@ typedef enum : int {
 + (void) sendFinishedNotifcationForAppIdentifier: (NSString*) identifier;
 + (void) sendRequestForRemoteControlNotification;
 
-// name of the device
+// name of the device (corresponding to kIOClassKey)
 + (const char*) remoteControlDeviceName;
 
 @end
