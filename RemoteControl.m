@@ -44,11 +44,18 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 
 // Designated initializer
 // returns nil if the remote control device is not available
-- (id) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
+- (instancetype) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
 	if ( (self = [super init]) ) {
 		_delegate = inRemoteControlDelegate;
 	}
 	return self;
+}
+
+// Cover the superclass' designated initialiser
+- (instancetype)init NS_UNAVAILABLE
+{
+	assert(0);
+	return nil;
 }
 
 - (void) setDelegate:(id<RemoteControlDelegate>)inDelegate {

@@ -61,7 +61,7 @@
 }
 
 // Designated initializer
-- (id) init;
+- (instancetype) init NS_DESIGNATED_INITIALIZER;
 
 #if _isMRR
 @property (readwrite, assign, nonatomic) id<MultiClickRemoteBehaviorDelegate> delegate;

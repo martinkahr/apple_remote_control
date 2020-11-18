@@ -12,7 +12,7 @@
 @implementation RemoteFeedbackView
 
 // Designated initializer
-- (id)initWithFrame:(NSRect)frameRect
+- (instancetype)initWithFrame:(NSRect)frameRect
 {
 	if ((self = [super initWithFrame:frameRect]) != nil) {
 		_remoteImage = [NSImage imageNamed:@"AppleRemote"];

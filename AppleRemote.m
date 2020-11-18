@@ -45,7 +45,7 @@ static void IOREInterestCallback(void *			refcon,
 }
 
 // Designated initializer
-- (id) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
+- (instancetype) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
 	if ((self = [super initWithDelegate: inRemoteControlDelegate])) {
 		// A security update in February of 2007 introduced an odd behavior.
 		// Whenever SecureEventInput is activated or deactivated the exclusive access

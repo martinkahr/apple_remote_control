@@ -118,7 +118,7 @@ typedef enum : int {
 
 // Designated initializer
 // returns nil if the remote control device is not available
-- (id) initWithDelegate: (id<RemoteControlDelegate>) remoteControlDelegate;
+- (instancetype) initWithDelegate: (id<RemoteControlDelegate>) remoteControlDelegate NS_DESIGNATED_INITIALIZER;
 
 #if _isMRR
 @property (readwrite, assign, nonatomic) id<RemoteControlDelegate> delegate;

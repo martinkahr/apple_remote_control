@@ -33,7 +33,7 @@ static const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 @implementation MultiClickRemoteBehavior
 
 // Designated initializer
-- (id) init {
+- (instancetype) init {
 	if ((self = [super init])) {
 		_maximumClickCountTimeDifference = DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE;
 	}

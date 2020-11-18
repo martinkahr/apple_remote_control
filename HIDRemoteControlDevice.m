@@ -89,7 +89,7 @@
 }
 
 // Designated initializer
-- (id) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
+- (instancetype) initWithDelegate: (id<RemoteControlDelegate>) inRemoteControlDelegate {
 	if ([[self class] isRemoteAvailable] == NO) {
 #if _isMRR
 		[self release];
