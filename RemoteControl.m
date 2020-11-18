@@ -92,18 +92,20 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 }
 
 + (void) sendDistributedNotification: (NSString*) notificationName targetBundleIdentifier: (NSString*) targetIdentifier {
-	NSString* deviceName = [NSString stringWithUTF8String:[self remoteControlDeviceName]];
+	const char* deviceName = [self remoteControlDeviceName];
 	NSString* bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-							  deviceName, kRemoteControlDeviceName,
-							  bundleIdentifier, kCFBundleIdentifierKey,
-							  targetIdentifier, kTargetApplicationIdentifier,
-							  nil];
-	
-	[[NSDistributedNotificationCenter defaultCenter] postNotificationName:notificationName
-																   object:nil
-																 userInfo:userInfo
-													   deliverImmediately:YES];
+	if (deviceName && bundleIdentifier) {
+		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+								  [NSString stringWithUTF8String:deviceName], kRemoteControlDeviceName,
+								  bundleIdentifier, kCFBundleIdentifierKey,
+								  targetIdentifier, kTargetApplicationIdentifier,
+								  nil];
+		
+		[[NSDistributedNotificationCenter defaultCenter] postNotificationName:notificationName
+																	   object:nil
+																	 userInfo:userInfo
+														   deliverImmediately:YES];
+	}
 }
 
 + (void) sendFinishedNotifcationForAppIdentifier: (NSString*) identifier {
