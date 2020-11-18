@@ -118,7 +118,11 @@ typedef enum {
 // returns nil if the remote control device is not available
 - (id) initWithDelegate: (id<RemoteControlDelegate>) remoteControlDelegate;
 
+#if _isMRR
 @property (readwrite, assign, nonatomic) id<RemoteControlDelegate> delegate;
+#else
+@property (readwrite, weak, nonatomic) id<RemoteControlDelegate> delegate;
+#endif
 
 @property (readwrite, getter=isListeningToRemote, nonatomic) BOOL listeningToRemote;
 

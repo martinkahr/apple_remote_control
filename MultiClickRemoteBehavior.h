@@ -63,8 +63,11 @@
 // Designated initializer
 - (id) init;
 
-// Delegates are not retained
+#if _isMRR
 @property (readwrite, assign, nonatomic) id<MultiClickRemoteBehaviorDelegate> delegate;
+#else
+@property (readwrite, weak, nonatomic) id<MultiClickRemoteBehaviorDelegate> delegate;
+#endif
 
 // Simulating hold events does deactivate sending of individual requests for pressed down/released.
 // Instead special hold events are being triggered when the user is pressing and holding a button for a small period.
