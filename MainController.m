@@ -57,7 +57,12 @@
 	NSString* buttonName=nil;
 	NSString* pressed=@"";
 	
-	if (pressedDown) pressed = @"(pressed)"; else pressed = @"(released)";
+	if (pressedDown) {
+		pressed = @"(pressed)";
+	}
+	else {
+		pressed = @"(released)";
+	}
 	
 	switch(buttonIdentifier) {
 		case kRemoteButtonPlus:
@@ -105,7 +110,9 @@
 	}
 
 	NSString* clickCountString = @"";
-	if (clickCount > 1) clickCountString = [NSString stringWithFormat: @"%u clicks", clickCount];
+	if (clickCount > 1) {
+		clickCountString = [NSString stringWithFormat: @"%u clicks", clickCount];
+	}
 	NSString* feedbackString = [NSString stringWithFormat:@"%@ %@ %@", buttonName, pressed, clickCountString];
 	[feedbackText setStringValue:feedbackString];
 	
@@ -114,7 +121,9 @@
 	
 	// print out events
 	NSLog(@"%@", feedbackString);
-	if (pressedDown == NO) printf("\n");
+	if (pressedDown == NO) {
+		printf("\n");
+	}
 }
 
 @end

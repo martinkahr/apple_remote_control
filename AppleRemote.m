@@ -92,14 +92,12 @@ static void IOREInterestCallback(void *			refcon,
 #if !_isGC
 - (void)dealloc
 {
-	if (_notifyPort)
-	{
+	if (_notifyPort) {
 		IONotificationPortDestroy(_notifyPort);
 		_notifyPort = NULL;
 	}
 	
-	if (_eventSecureInputNotification)
-	{
+	if (_eventSecureInputNotification) {
 		IOObjectRelease (_eventSecureInputNotification);
 		_eventSecureInputNotification = MACH_PORT_NULL;
 	}
@@ -113,14 +111,12 @@ static void IOREInterestCallback(void *			refcon,
 #if _isGC
 - (void)finalize
 {
-	if (_notifyPort)
-	{
+	if (_notifyPort) {
 		IONotificationPortDestroy(_notifyPort);
 		_notifyPort = NULL;
 	}
 	
-	if (_eventSecureInputNotification)
-	{
+	if (_eventSecureInputNotification) {
 		// Although IOObjectRelease is not documented as thread safe, I was assured at WWDC09 that it is.
 		IOObjectRelease (_eventSecureInputNotification);
 		_eventSecureInputNotification = MACH_PORT_NULL;
@@ -206,7 +202,9 @@ static void IOREInterestCallback(void *			refcon,
 	// Create a CFString version of the remote name.
 	const char* remoteControlDeviceName = [self remoteControlDeviceName];
 	CFStringRef remoteName = CFStringCreateWithCString(kCFAllocatorDefault, remoteControlDeviceName, kCFStringEncodingUTF8);
-	if (!remoteName) return 0;
+	if (!remoteName) {
+		return 0;
+	}
 	
 	// Set up a matching dictionary to search the I/O Registry by class
 	// name for all HID class devices
@@ -217,36 +215,27 @@ static void IOREInterestCallback(void *			refcon,
 	io_object_t	hidDevice = 0;
 	IOReturn ioReturnValue = IOServiceGetMatchingServices(kIOMasterPortDefault, hidMatchDictionary, &hidObjectIterator);
 	
-	if ((ioReturnValue == kIOReturnSuccess) && (hidObjectIterator != 0))
-	{
+	if ((ioReturnValue == kIOReturnSuccess) && (hidObjectIterator != 0)) {
 		io_object_t matchingService = 0, foundService = 0;
 		BOOL finalMatch = NO;
 		
-		while ((matchingService = IOIteratorNext(hidObjectIterator)))
-		{
-			if (!finalMatch)
-			{
-				if (!foundService)
-				{
-					if (IOObjectRetain(matchingService) == kIOReturnSuccess)
-					{
+		while ((matchingService = IOIteratorNext(hidObjectIterator))) {
+			if (!finalMatch) {
+				if (!foundService) {
+					if (IOObjectRetain(matchingService) == kIOReturnSuccess) {
 						foundService = matchingService;
 					}
 				}
 				
 				CFStringRef className = IORegistryEntryCreateCFProperty((io_registry_entry_t)matchingService, CFSTR(kIOClassKey), kCFAllocatorDefault, 0);
-				if (className)
-				{
-					if (CFStringCompare(className, remoteName, 0) == kCFCompareEqualTo)
-					{
-						if (foundService)
-						{
+				if (className) {
+					if (CFStringCompare(className, remoteName, 0) == kCFCompareEqualTo) {
+						if (foundService) {
 							IOObjectRelease(foundService);
 							foundService = 0;
 						}
 						
-						if (IOObjectRetain(matchingService) == kIOReturnSuccess)
-						{
+						if (IOObjectRetain(matchingService) == kIOReturnSuccess) {
 							foundService = matchingService;
 							finalMatch = YES;
 						}
@@ -299,10 +288,14 @@ static void IOREInterestCallback(void *			refcon,
 }
 
 - (void) dealWithSecureEventInputChange {
-	if ([self isListeningToRemote] == NO || [self isOpenInExclusiveMode] == NO) return;
+	if ([self isListeningToRemote] == NO || [self isOpenInExclusiveMode] == NO) {
+		return;
+	}
 	
 	BOOL newState = [self retrieveSecureEventInputState];
-	if (_lastSecureEventInputState == newState) return;
+	if (_lastSecureEventInputState == newState) {
+		return;
+	}
 	
 	// close and open the device again
 	[self closeRemoteControlDevice: NO];

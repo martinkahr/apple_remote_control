@@ -159,7 +159,9 @@
 
 - (void) openRemoteControlDevice {
 	io_object_t hidDevice = [[self class] findRemoteDevice];
-	if (hidDevice == 0) return;
+	if (hidDevice == 0) {
+		return;
+	}
 	
 	if ([self createInterfaceForDevice:hidDevice] == NULL) {
 		goto error;
@@ -226,8 +228,10 @@ cleanup:
 - (IBAction) startListening: (id) sender {
 	(void)sender;
 	
-	if ([self isListeningToRemote]) return;
-
+	if ([self isListeningToRemote]) {
+		return;
+	}
+	
 	[self willChangeValueForKey:@"listeningToRemote"];
 
 	[self openRemoteControlDevice];
@@ -238,7 +242,9 @@ cleanup:
 - (IBAction) stopListening: (id) sender {
 	(void)sender;
 
-	if ([self isListeningToRemote]==NO) return;
+	if ([self isListeningToRemote]==NO) {
+		return;
+	}
 	
 	[self willChangeValueForKey:@"listeningToRemote"];
 	
@@ -265,14 +271,18 @@ cleanup:
 }
 
 - (NSString*) validCookieSubstring: (NSString*) cookieString {
-	if ([cookieString length] == 0) return nil;
+	if ([cookieString length] == 0) {
+		return nil;
+	}
 	NSEnumerator* keyEnum = [[self cookieToButtonMapping] keyEnumerator];
 	NSString* key;
 	
 	// find the best match
 	while( (key = [keyEnum nextObject]) ) {
 		NSRange range = [cookieString rangeOfString:key];
-		if (range.location == 0) return key;
+		if (range.location == 0) {
+			return key;
+		}
 	}
 	return nil;
 }
@@ -284,7 +294,9 @@ cleanup:
 		NSLog(@"New cookie string is %@", cookieString);
 		[previousRemainingCookieString release], previousRemainingCookieString=nil;
 	}*/
-	if ([cookieString length] == 0) return;
+	if ([cookieString length] == 0) {
+		return;
+	}
 	
 	NSNumber* buttonId = [[self cookieToButtonMapping] objectForKey: cookieString];
 	if (buttonId != nil) {
@@ -316,7 +328,9 @@ cleanup:
 		while( (subCookieString = [self validCookieSubstring: cookieString]) ) {
 			cookieString = [cookieString substringFromIndex: [subCookieString length]];
 			lastSubCookieString = subCookieString;
-			if (_processesBacklog) [self handleEventWithCookieString: subCookieString sumOfValues:sumOfValues];
+			if (_processesBacklog) {
+				[self handleEventWithCookieString: subCookieString sumOfValues:sumOfValues];
+			}
 		}
 		if (_processesBacklog == NO && lastSubCookieString != nil) {
 			// process the last event of the backlog and assume that the button is not pressed down any longer.
@@ -371,8 +385,9 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 		while (result == kIOReturnSuccess)
 		{
 			result = (*[remote queue])->getNextEvent([remote queue], &event, zeroTime, 0);
-			if ( result != kIOReturnSuccess )
+			if ( result != kIOReturnSuccess ) {
 				continue;
+			}
 			
 			//printf("%lu %d %p\n", (unsigned long)event.elementCookie, event.value, event.longValue);
 			
@@ -413,8 +428,7 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 													  kIOCFPlugInInterfaceID,
 													  &plugInInterface,
 													  &score);
-	if (ioReturnValue == kIOReturnSuccess)
-	{
+	if (ioReturnValue == kIOReturnSuccess) {
 		//Call a method of the intermediate plug-in to create the device interface
 		plugInResult = (*plugInInterface)->QueryInterface(plugInInterface, CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID), (LPVOID) &_hidDeviceInterface);
 		
@@ -422,14 +436,18 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 			NSLog(@"Error: Couldn't create HID class device interface");
 		}
 		// Release
-		if (plugInInterface) (*plugInInterface)->Release(plugInInterface);
+		if (plugInInterface) {
+			(*plugInInterface)->Release(plugInInterface);
+		}
 	}
 	return _hidDeviceInterface;
 }
 
 - (BOOL) initializeCookies {
 	IOHIDDeviceInterface122** handle = (IOHIDDeviceInterface122**)_hidDeviceInterface;
-	if (!handle || !(*handle)) return NO;
+	if (!handle || !(*handle)) {
+		return NO;
+	}
 	
 	// Copy all elements, since we're grabbing most of the elements
 	// for this device anyway, and thus, it's faster to iterate them
@@ -450,15 +468,21 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 				
 				// Get cookie
 				CFNumberRef cookie = CFDictionaryGetValue(element, CFSTR(kIOHIDElementCookieKey));
-				if (cookie == NULL || CFGetTypeID(cookie) != CFNumberGetTypeID()) continue;
+				if (cookie == NULL || CFGetTypeID(cookie) != CFNumberGetTypeID()) {
+					continue;
+				}
 				
 				// Get usage
 				CFNumberRef usage = CFDictionaryGetValue(element, CFSTR(kIOHIDElementUsageKey));
-				if (usage == NULL || CFGetTypeID(usage) != CFNumberGetTypeID()) continue;
+				if (usage == NULL || CFGetTypeID(usage) != CFNumberGetTypeID()) {
+					continue;
+				}
 				
 				// Get usage page
 				CFNumberRef usagePage = CFDictionaryGetValue(element, CFSTR(kIOHIDElementUsagePageKey));
-				if (usagePage == NULL || CFGetTypeID(usagePage) != CFNumberGetTypeID()) continue;
+				if (usagePage == NULL || CFGetTypeID(usagePage) != CFNumberGetTypeID()) {
+					continue;
+				}
 				
 				CFArrayAppendValue(_allCookies, cookie);
 			}
@@ -476,7 +500,9 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 	HRESULT  result;
 	
 	IOHIDOptionsType openMode = kIOHIDOptionsTypeNone;
-	if ([self isOpenInExclusiveMode]) openMode = kIOHIDOptionsTypeSeizeDevice;
+	if ([self isOpenInExclusiveMode]) {
+		openMode = kIOHIDOptionsTypeSeizeDevice;
+	}
 	IOReturn ioReturnValue = (*_hidDeviceInterface)->open(_hidDeviceInterface, openMode);
 	
 	if (ioReturnValue == KERN_SUCCESS) {

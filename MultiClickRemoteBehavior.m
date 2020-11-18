@@ -41,7 +41,9 @@ static const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 }
 
 - (void) setDelegate: (id<MultiClickRemoteBehaviorDelegate>) inDelegate {
-	if (inDelegate && [inDelegate respondsToSelector:@selector(remoteButton:pressedDown:clickCount:)]==NO) return;
+	if (inDelegate && [inDelegate respondsToSelector:@selector(remoteButton:pressedDown:clickCount:)]==NO) {
+		return;
+	}
 	
 	_delegate = inDelegate;
 }
@@ -53,7 +55,9 @@ static const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 
 - (BOOL) simulatesHoldForButtonIdentifier: (RemoteControlEventIdentifier) identifier remoteControl: (RemoteControl*) remoteControl {
 	// we do that check only for the normal button identifiers as we would check for hold support for hold events instead
-	if (identifier > (1 << EVENT_TO_HOLD_EVENT_OFFSET)) return NO;
+	if (identifier > (1 << EVENT_TO_HOLD_EVENT_OFFSET)) {
+		return NO;
+	}
 	
 	return [self simulateHoldEvent] && [remoteControl sendsEventForButtonIdentifier: (identifier << EVENT_TO_HOLD_EVENT_OFFSET)]==NO;
 }
@@ -118,7 +122,9 @@ static const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 
 - (void) sendRemoteButtonEvent: (RemoteControlEventIdentifier) event pressedDown: (BOOL) pressedDown remoteControl: (RemoteControl*) remoteControl {
 	id<MultiClickRemoteBehaviorDelegate> strongDelegate = [self delegate];
-	if (!strongDelegate)  return;
+	if (!strongDelegate) {
+		return;
+	}
 	
 	BOOL clickCountingForEvent = ([self clickCountEnabledButtons] & event) == event;
 
@@ -171,7 +177,9 @@ static const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 	}
 	
 	if (clickCountingForEvent) {
-		if (pressedDown == NO) return;
+		if (pressedDown == NO) {
+			return;
+		}
 
 		NSNumber* eventNumber;
 		NSNumber* timeNumber;
