@@ -32,10 +32,10 @@
 #import <IOKit/hid/IOHIDKeys.h>
 #import <IOKit/IOKitLib.h>
 
-static void IOREInterestCallback(void *			refcon,
-								 io_service_t	service,
-								 uint32_t		messageType,
-								 void *			messageArgument );
+static void AppleRemoteIOREInterestCallback(void *			refcon,
+											io_service_t	service,
+											uint32_t		messageType,
+											void *			messageArgument );
 
 
 @implementation AppleRemote
@@ -70,7 +70,7 @@ static void IOREInterestCallback(void *			refcon,
 					kr = IOServiceAddInterestNotification(_notifyPort,
 														  entry,
 														  kIOBusyInterest,
-														  &IOREInterestCallback,
+														  &AppleRemoteIOREInterestCallback,
 														  (_arcbridge void *)(self),
 														  &_eventSecureInputNotification );
 					if (kr != KERN_SUCCESS) {
@@ -309,10 +309,10 @@ static void IOREInterestCallback(void *			refcon,
 	_lastSecureEventInputState = newState;
 } 
 
-static void IOREInterestCallback(void *			refcon,
-								 io_service_t	service,
-								 uint32_t		messageType,
-								 void *			messageArgument )
+static void AppleRemoteIOREInterestCallback(void *			refcon,
+											io_service_t	service,
+											uint32_t		messageType,
+											void *			messageArgument )
 {
 	(void)service;
 	(void)messageType;
