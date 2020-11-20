@@ -143,38 +143,38 @@ static void IOREInterestCallback(void *			refcon,
 	
 	if ((floor(NSFoundationVersionNumber) <= 677.00 /*NSFoundationVersionNumber10_5*/) || (leopardEmulation)) {
 		// 10.5.x Leopard
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlus]		forKey:@"31_29_28_19_18_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMinus]		forKey:@"31_30_28_19_18_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu]		forKey:@"31_20_19_18_31_20_19_18_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]		forKey:@"31_21_19_18_31_21_19_18_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonRight]		forKey:@"31_22_19_18_31_22_19_18_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft]		forKey:@"31_23_19_18_31_23_19_18_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonRight_Hold]	forKey:@"31_19_18_4_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft_Hold]	forKey:@"31_19_18_3_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu_Hold]	forKey:@"31_19_18_31_19_18_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"35_31_19_18_35_31_19_18_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]	forKey:@"19_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonPlus)			forKey:@"31_29_28_19_18_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonMinus)		forKey:@"31_30_28_19_18_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonMenu)			forKey:@"31_20_19_18_31_20_19_18_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonPlay)			forKey:@"31_21_19_18_31_21_19_18_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonRight)		forKey:@"31_22_19_18_31_22_19_18_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonLeft)			forKey:@"31_23_19_18_31_23_19_18_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonRight_Hold)	forKey:@"31_19_18_4_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonLeft_Hold)	forKey:@"31_19_18_3_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonMenu_Hold)	forKey:@"31_19_18_31_19_18_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonPlay_Hold)	forKey:@"35_31_19_18_35_31_19_18_"];
+		[inCookieToButtonMapping setObject:@(kRemoteControl_Switched)	forKey:@"19_"];
 	} else {
 		// 10.6.2 Snow Leopard or later
 		// Note: does not work on 10.6.0 and 10.6.1
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlus]		forKey:@"33_31_30_21_20_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMinus]		forKey:@"33_32_30_21_20_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu]		forKey:@"33_22_21_20_2_33_22_21_20_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]		forKey:@"33_23_21_20_2_33_23_21_20_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonRight]		forKey:@"33_24_21_20_2_33_24_21_20_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft]		forKey:@"33_25_21_20_2_33_25_21_20_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonRight_Hold]	forKey:@"33_21_20_14_12_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonLeft_Hold]	forKey:@"33_21_20_13_12_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonMenu_Hold]	forKey:@"33_21_20_2_33_21_20_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"37_33_21_20_2_37_33_21_20_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]	forKey:@"19_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonPlus)			forKey:@"33_31_30_21_20_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonMinus)		forKey:@"33_32_30_21_20_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonMenu)			forKey:@"33_22_21_20_2_33_22_21_20_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonPlay)			forKey:@"33_23_21_20_2_33_23_21_20_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonRight)		forKey:@"33_24_21_20_2_33_24_21_20_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonLeft)			forKey:@"33_25_21_20_2_33_25_21_20_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonRight_Hold)	forKey:@"33_21_20_14_12_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonLeft_Hold)	forKey:@"33_21_20_13_12_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonMenu_Hold)	forKey:@"33_21_20_2_33_21_20_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonPlay_Hold)	forKey:@"37_33_21_20_2_37_33_21_20_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteControl_Switched)	forKey:@"19_"];
 		
 		// new Aluminum model
 		// Mappings changed due to addition of a 7th center button
 		// Treat the new center button and play/pause button the same
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]		forKey:@"33_21_20_8_2_33_21_20_8_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay]		forKey:@"33_21_20_3_2_33_21_20_3_2_"];
-		[inCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonPlay_Hold]	forKey:@"33_21_20_11_2_33_21_20_11_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonPlay)			forKey:@"33_21_20_8_2_33_21_20_8_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonPlay)			forKey:@"33_21_20_3_2_33_21_20_3_2_"];
+		[inCookieToButtonMapping setObject:@(kRemoteButtonPlay_Hold)	forKey:@"33_21_20_11_2_33_21_20_11_2_"];
 	}
 
 }

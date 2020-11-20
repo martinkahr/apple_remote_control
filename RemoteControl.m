@@ -97,7 +97,7 @@ NSString* const kTargetApplicationIdentifier = @"TargetBundleIdentifier";
 	NSString* bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
 	if (deviceName && bundleIdentifier) {
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-								  [NSString stringWithUTF8String:deviceName], kRemoteControlDeviceName,
+								  @(deviceName), kRemoteControlDeviceName,
 								  bundleIdentifier, kCFBundleIdentifierKey,
 								  targetIdentifier, kTargetApplicationIdentifier, // can be nil
 								  nil];
