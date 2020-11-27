@@ -127,6 +127,8 @@
 #endif
 
 - (void) sendRemoteButtonEvent: (RemoteControlEventIdentifier) event pressedDown: (BOOL) pressedDown {
+	//NSLog(@"Button 0x%x %s", event, pressedDown ? "pressed down" : "released");
+	
 	id<RemoteControlDelegate> strongDelegate = [self delegate];
 	[strongDelegate sendRemoteButtonEvent: event pressedDown: pressedDown remoteControl:self];
 }
@@ -291,12 +293,9 @@ cleanup:
 
 - (void) handleEventWithCookieString: (NSString*) cookieString sumOfValues: (SInt32) sumOfValues {
 	assert(cookieString);
-	/*
-	if (previousRemainingCookieString) {
-		cookieString = [previousRemainingCookieString stringByAppendingString: cookieString];
-		NSLog(@"New cookie string is %@", cookieString);
-		[previousRemainingCookieString release], previousRemainingCookieString=nil;
-	}*/
+	
+	//NSLog(@"handleEventWithCookieString: %@ sumOfValues:%d", cookieString, sumOfValues);
+	
 	if ([cookieString length] == 0) {
 		return;
 	}
@@ -405,6 +404,8 @@ static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, v
 				[cookieString appendString:[NSString stringWithFormat:@"%lu_", (unsigned long)event.elementCookie]];
 			}
 		}
+		
+		//NSLog(@"raw cookieString: %@, sumOfValues: %d", cookieString, sumOfValues);
 		
 		[remote handleEventWithCookieString: cookieString sumOfValues: sumOfValues];
 	}
