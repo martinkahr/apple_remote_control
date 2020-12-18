@@ -3,7 +3,7 @@
  * RemoteControlWrapper
  *
  * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
- * Copyright (c) 2006 martinkahr.com. All rights reserved.
+ * Copyright (c) 2006-2016 martinkahr.com. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -15,7 +15,7 @@
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -31,17 +31,17 @@
 #import <IOKit/IOCFPlugIn.h>
 #import <IOKit/hid/IOHIDKeys.h>
 
-@interface HIDRemoteControlDevice (PrivateMethods) 
+@interface HIDRemoteControlDevice (PrivateMethods)
 - (NSDictionary*) cookieToButtonMapping;
 - (IOHIDQueueInterface**) queue;
 - (IOHIDDeviceInterface**) hidDeviceInterface;
-- (void) handleEventWithCookieString: (NSString*) cookieString sumOfValues: (SInt32) sumOfValues; 
+- (void) handleEventWithCookieString: (NSString*) cookieString sumOfValues: (SInt32) sumOfValues;
 - (void) removeNotifcationObserver;
 - (void) remoteControlAvailable:(NSNotification *)notification;
 
 @end
 
-@interface HIDRemoteControlDevice (IOKitMethods) 
+@interface HIDRemoteControlDevice (IOKitMethods)
 - (IOHIDDeviceInterface**) createInterfaceForDevice: (io_object_t) hidDevice;
 - (BOOL) initializeCookies;
 - (BOOL) openDevice;
@@ -54,19 +54,19 @@
 	return "";
 }
 
-+ (BOOL) isRemoteAvailable {	
++ (BOOL) isRemoteAvailable {
 	io_object_t hidDevice = [self findRemoteDevice];
 	if (hidDevice != 0) {
 		IOObjectRelease(hidDevice);
 		return YES;
 	} else {
-		return NO;		
+		return NO;
 	}
 }
 
 + (io_object_t) findRemoteDevice {
 	CFMutableDictionaryRef hidMatchDictionary = NULL;
-	IOReturn ioReturnValue = kIOReturnSuccess;	
+	IOReturn ioReturnValue = kIOReturnSuccess;
 	io_iterator_t hidObjectIterator = 0;
 	io_object_t	hidDevice = 0;
 	
@@ -77,10 +77,9 @@
 	// Now search I/O Registry for matching devices.
 	ioReturnValue = IOServiceGetMatchingServices(kIOMasterPortDefault, hidMatchDictionary, &hidObjectIterator);
 	
-	if (hidObjectIterator != 0) {
-		if (ioReturnValue == kIOReturnSuccess) {
-			hidDevice = IOIteratorNext(hidObjectIterator);
-		}
+	if ((ioReturnValue == kIOReturnSuccess) && (hidObjectIterator != 0)) {
+		hidDevice = IOIteratorNext(hidObjectIterator);
+
 		// release the iterator
 		IOObjectRelease(hidObjectIterator);
 	}
@@ -89,41 +88,53 @@
 	return hidDevice;
 }
 
-- (id) initWithDelegate: (id) _remoteControlDelegate {	
+// Designated initializer
+- (nullable instancetype) initWithDelegate: (nullable id<RemoteControlDelegate>) inRemoteControlDelegate {
 	if ([[self class] isRemoteAvailable] == NO) {
-		[super dealloc];
+#if _isMRR
+		[self release];
+#endif
 		self = nil;
-	} else if ( (self = [super initWithDelegate: _remoteControlDelegate]) ) {
-		openInExclusiveMode = YES;
-		queue = NULL;
-		hidDeviceInterface = NULL;
-		cookieToButtonMapping = [[NSMutableDictionary alloc] init];
+	} else if ( (self = [super initWithDelegate: inRemoteControlDelegate]) ) {
+		_openInExclusiveMode = YES;
+		_queue = NULL;
+		_hidDeviceInterface = NULL;
+		_cookieToButtonMapping = [[NSMutableDictionary alloc] init];
 		
-		[self setCookieMappingInDictionary: cookieToButtonMapping];
+		[self setCookieMappingInDictionary: _cookieToButtonMapping];
 
-		NSEnumerator* enumerator = [cookieToButtonMapping objectEnumerator];
+		NSEnumerator* enumerator = [_cookieToButtonMapping objectEnumerator];
 		NSNumber* identifier;
-		supportedButtonEvents = 0;
+		_supportedButtonEvents = 0;
 		while( (identifier = [enumerator nextObject]) ) {
-			supportedButtonEvents |= [identifier intValue];
-		}		
+			_supportedButtonEvents |= [identifier intValue];
+		}
 	}
 	
 	return self;
 }
 
+#if !_isGC
 - (void) dealloc {
 	[self removeNotifcationObserver];
 	[self stopListening:self];
-	[cookieToButtonMapping release]; cookieToButtonMapping = nil;
+#if _isMRR
+	[_cookieToButtonMapping release];
+	_cookieToButtonMapping = nil;
 	[super dealloc];
+#endif
 }
+#endif
 
 - (void) sendRemoteButtonEvent: (RemoteControlEventIdentifier) event pressedDown: (BOOL) pressedDown {
-	[delegate sendRemoteButtonEvent: event pressedDown: pressedDown remoteControl:self];
+	//NSLog(@"Button 0x%x %s", event, pressedDown ? "pressed down" : "released");
+	
+	id<RemoteControlDelegate> strongDelegate = [self delegate];
+	[strongDelegate sendRemoteButtonEvent: event pressedDown: pressedDown remoteControl:self];
 }
 
 - (void) setCookieMappingInDictionary: (NSMutableDictionary*) aCookieToButtonMapping {
+	assert(aCookieToButtonMapping);
 	(void)aCookieToButtonMapping;
 }
 - (int) remoteIdSwitchCookie {
@@ -131,11 +142,11 @@
 }
 
 - (BOOL) sendsEventForButtonIdentifier: (RemoteControlEventIdentifier) identifier {
-	return (supportedButtonEvents & identifier) == identifier;
+	return (_supportedButtonEvents & identifier) == identifier;
 }
 	
 - (BOOL) isListeningToRemote {
-	return (hidDeviceInterface != NULL && allCookies != NULL && queue != NULL);	
+	return (_hidDeviceInterface != NULL && _allCookies != NULL && _queue != NULL);
 }
 
 - (void) setListeningToRemote: (BOOL) value {
@@ -146,23 +157,15 @@
 	}
 }
 
-- (BOOL) isOpenInExclusiveMode {
-	return openInExclusiveMode;
-}
-- (void) setOpenInExclusiveMode: (BOOL) value {
-	openInExclusiveMode = value;
-}
+@synthesize openInExclusiveMode = _openInExclusiveMode;
 
-- (BOOL) processesBacklog {
-	return processesBacklog;
-}
-- (void) setProcessesBacklog: (BOOL) value {
-	processesBacklog = value;
-}
+@synthesize processesBacklog = _processesBacklog;
 
 - (void) openRemoteControlDevice {
 	io_object_t hidDevice = [[self class] findRemoteDevice];
-	if (hidDevice == 0) return;
+	if (hidDevice == 0) {
+		return;
+	}
 	
 	if ([self createInterfaceForDevice:hidDevice] == NULL) {
 		goto error;
@@ -187,113 +190,122 @@ cleanup:
 - (void) closeRemoteControlDevice: (BOOL) shallSendNotifications {
 	BOOL sendNotification = NO;
 	
-	if (eventSource != NULL) {
-		CFRunLoopRemoveSource(CFRunLoopGetCurrent(), eventSource, kCFRunLoopDefaultMode);
-		CFRelease(eventSource);
-		eventSource = NULL;
+	if (_eventSource != NULL) {
+		CFRunLoopRemoveSource(CFRunLoopGetCurrent(), _eventSource, kCFRunLoopDefaultMode);
+		CFRelease(_eventSource);
+		_eventSource = NULL;
 	}
-	if (queue != NULL) {
-		(*queue)->stop(queue);		
+	if (_queue != NULL) {
+		(*_queue)->stop(_queue);
 		
 		//dispose of queue
-		(*queue)->dispose(queue);		
+		(*_queue)->dispose(_queue);
 		
 		//release the queue we allocated
-		(*queue)->Release(queue);	
+		(*_queue)->Release(_queue);
 		
-		queue = NULL;
+		_queue = NULL;
 		
 		sendNotification = YES;
 	}
 	
-	if (allCookies != nil) {
-		[allCookies autorelease];
-		allCookies = nil;
+	if (_allCookies != NULL) {
+		CFRelease(_allCookies);
+		_allCookies = NULL;
 	}
 	
-	if (hidDeviceInterface != NULL) {
+	if (_hidDeviceInterface != NULL) {
 		//close the device
-		(*hidDeviceInterface)->close(hidDeviceInterface);
+		(*_hidDeviceInterface)->close(_hidDeviceInterface);
 		
 		//release the interface	
-		(*hidDeviceInterface)->Release(hidDeviceInterface);
+		(*_hidDeviceInterface)->Release(_hidDeviceInterface);
 		
-		hidDeviceInterface = NULL;
+		_hidDeviceInterface = NULL;
 	}
-		
+	
 	if (shallSendNotifications && [self isOpenInExclusiveMode] && sendNotification) {
-		[[self class] sendFinishedNotifcationForAppIdentifier: nil];		
-	}		
+		[[self class] sendFinishedNotifcationForAppIdentifier: nil];
+	}
 }
 
-- (IBAction) startListening: (id) sender {	
+- (IBAction) startListening: (id) sender {
 	(void)sender;
 	
-	if ([self isListeningToRemote]) return;
-
-	[self willChangeValueForKey:@"listeningToRemote"];	
+	if ([self isListeningToRemote]) {
+		return;
+	}
+	
+	[self willChangeValueForKey:@"listeningToRemote"];
 
 	[self openRemoteControlDevice];
 	
-	[self didChangeValueForKey:@"listeningToRemote"];				
+	[self didChangeValueForKey:@"listeningToRemote"];
 }
 
 - (IBAction) stopListening: (id) sender {
 	(void)sender;
 
-	if ([self isListeningToRemote]==NO) return;
+	if ([self isListeningToRemote]==NO) {
+		return;
+	}
 	
 	[self willChangeValueForKey:@"listeningToRemote"];
 	
 	[self closeRemoteControlDevice: YES];
 	
-	[self didChangeValueForKey:@"listeningToRemote"];	
+	[self didChangeValueForKey:@"listeningToRemote"];
 }
 
 @end
 
-@implementation HIDRemoteControlDevice (PrivateMethods) 
+@implementation HIDRemoteControlDevice (PrivateMethods)
 
 - (IOHIDQueueInterface**) queue {
-	return queue;
+	return _queue;
 }
 
 - (IOHIDDeviceInterface**) hidDeviceInterface {
-	return hidDeviceInterface;
+	return _hidDeviceInterface;
 }
 
 
 - (NSDictionary*) cookieToButtonMapping {
-	return cookieToButtonMapping;
+	return _cookieToButtonMapping;
 }
 
 - (NSString*) validCookieSubstring: (NSString*) cookieString {
-	if (cookieString == nil || [cookieString length] == 0) return nil;
+	if ([cookieString length] == 0) {
+		return nil;
+	}
 	NSEnumerator* keyEnum = [[self cookieToButtonMapping] keyEnumerator];
 	NSString* key;
 	
 	// find the best match
 	while( (key = [keyEnum nextObject]) ) {
 		NSRange range = [cookieString rangeOfString:key];
-		if (range.location == 0) return key; 
+		if (range.location == 0) {
+			return key;
+		}
 	}
 	return nil;
 }
 
 - (void) handleEventWithCookieString: (NSString*) cookieString sumOfValues: (SInt32) sumOfValues {
-	/*
-	if (previousRemainingCookieString) {
-		cookieString = [previousRemainingCookieString stringByAppendingString: cookieString];
-		NSLog(@"New cookie string is %@", cookieString);
-		[previousRemainingCookieString release], previousRemainingCookieString=nil;							
-	}*/
-	if (cookieString == nil || [cookieString length] == 0) return;
-			
+	assert(cookieString);
+	
+	//NSLog(@"handleEventWithCookieString: %@ sumOfValues:%d", cookieString, sumOfValues);
+	
+	if ([cookieString length] == 0) {
+		return;
+	}
+	
 	NSNumber* buttonId = [[self cookieToButtonMapping] objectForKey: cookieString];
 	if (buttonId != nil) {
-		[self sendRemoteButtonEvent: [buttonId intValue] pressedDown: (sumOfValues>0)];
+		RemoteControlEventIdentifier remoteControlEvent = (RemoteControlEventIdentifier)[buttonId intValue];
+		[self sendRemoteButtonEvent: remoteControlEvent pressedDown: (sumOfValues>0)];
 	} else {
-		// let's see if this is the first event after a restart of the OS. 
+		// let's see if this is the first event after a restart of the OS, or the first from this remote after a different one was used.
 		// In this case the event has a prefix that we can ignore and we just get the down event but no up event
 		NSEnumerator* keyEnum = [[self cookieToButtonMapping] keyEnumerator];
 		NSString* key;
@@ -302,13 +314,19 @@ cleanup:
 			if (range.location != NSNotFound && range.location > 0) {
 				buttonId = [[self cookieToButtonMapping] objectForKey: key];
 				if (buttonId != nil) {
-					[self sendRemoteButtonEvent: [buttonId intValue] pressedDown: YES];
-					[self sendRemoteButtonEvent: [buttonId intValue] pressedDown: NO];
-					return;
-				}				
+					RemoteControlEventIdentifier remoteControlEvent = (RemoteControlEventIdentifier)[buttonId intValue];
+					
+					// In the AppleRemote subclass the sendRemoteButtonEvent:pressedDown: does some extra magic that
+					// results in the delegate being called exactly once or twice, but here we always want exactly twice:
+					// firist pressedDown:YES then pressedDown:NO, so just message the delegate directly.
+					id<RemoteControlDelegate> strongDelegate = [self delegate];
+					[strongDelegate sendRemoteButtonEvent: remoteControlEvent pressedDown: YES remoteControl:self];
+					[strongDelegate sendRemoteButtonEvent: remoteControlEvent pressedDown: NO remoteControl:self];
+				}
+				
 				return;
 			}
-		}					
+		}
 		
 		// let's see if a number of events are stored in the cookie string. this does
 		// happen when the main thread is too busy to handle all incoming events in time.
@@ -317,18 +335,20 @@ cleanup:
 		while( (subCookieString = [self validCookieSubstring: cookieString]) ) {
 			cookieString = [cookieString substringFromIndex: [subCookieString length]];
 			lastSubCookieString = subCookieString;
-			if (processesBacklog) [self handleEventWithCookieString: subCookieString sumOfValues:sumOfValues];
+			if (_processesBacklog) {
+				[self handleEventWithCookieString: subCookieString sumOfValues:sumOfValues];
+			}
 		}
-		if (processesBacklog == NO && lastSubCookieString != nil) {
+		if (_processesBacklog == NO && lastSubCookieString != nil) {
 			// process the last event of the backlog and assume that the button is not pressed down any longer.
 			// The events in the backlog do not seem to be in order and therefore (in rare cases) the last event might be 
-			// a button pressed down event while in reality the user has released it. 
-			// NSLog(@"processing last event of backlog");
+			// a button pressed down event while in reality the user has released it.
+			// NSLog(@"processing last event of backlog: %@", lastSubCookieString);
 			[self handleEventWithCookieString: lastSubCookieString sumOfValues:0];
 		}
 		if ([cookieString length] > 0) {
 			NSLog(@"Unknown button for cookiestring %@", cookieString);
-		}		
+		}
 	}
 }
 
@@ -338,6 +358,7 @@ cleanup:
 }
 
 - (void) remoteControlAvailable:(NSNotification *)notification {
+	assert(notification);
 	(void)notification;
 	[self removeNotifcationObserver];
 	[self startListening: self];
@@ -348,7 +369,7 @@ cleanup:
 /*	Callback method for the device queue
 Will be called for any event of any type (cookie) to which we subscribe
 */
-static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, void* sender) {	
+static void QueueCallbackFunction(void* target, IOReturn result, void* refcon, void* sender) {
 	(void)refcon;
 	(void)sender;
 	
@@ -356,116 +377,121 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 		NSLog(@"QueueCallbackFunction called with invalid target!");
 		return;
 	}
+	
+#if _isMRR
 	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+#elif _isARC
+	@autoreleasepool
+#endif
 	
-	HIDRemoteControlDevice* remote = (HIDRemoteControlDevice*)target;	
-	IOHIDEventStruct event;	
-	AbsoluteTime 	 zeroTime = {0,0};
-	NSMutableString* cookieString = [NSMutableString string];
-	SInt32			 sumOfValues = 0;
-	while (result == kIOReturnSuccess)
 	{
-		result = (*[remote queue])->getNextEvent([remote queue], &event, zeroTime, 0);		
-		if ( result != kIOReturnSuccess )
-			continue;
-	
-		//printf("%u %d %p\n", event.elementCookie, event.value, event.longValue);		
-		
-		if (((int)event.elementCookie)!=5) {
-			sumOfValues+=event.value;
-			[cookieString appendString:[NSString stringWithFormat:@"%u_", event.elementCookie]];
+		HIDRemoteControlDevice* remote = (_arcbridge HIDRemoteControlDevice*)target;
+		IOHIDEventStruct event;
+		AbsoluteTime 	 zeroTime = {0,0};
+		NSMutableString* cookieString = [NSMutableString string];
+		SInt32			 sumOfValues = 0;
+		while (result == kIOReturnSuccess)
+		{
+			result = (*[remote queue])->getNextEvent([remote queue], &event, zeroTime, 0);
+			if ( result != kIOReturnSuccess ) {
+				continue;
+			}
+			
+			//printf("%lu %d %p\n", (unsigned long)event.elementCookie, event.value, event.longValue);
+			
+			if (((unsigned long)event.elementCookie)!=5) {
+				sumOfValues+=event.value;
+				[cookieString appendString:[NSString stringWithFormat:@"%lu_", (unsigned long)event.elementCookie]];
+			}
 		}
+		
+		//NSLog(@"raw cookieString: %@, sumOfValues: %d", cookieString, sumOfValues);
+		
+		[remote handleEventWithCookieString: cookieString sumOfValues: sumOfValues];
 	}
-
-	[remote handleEventWithCookieString: cookieString sumOfValues: sumOfValues];
 	
-	[pool release];
+#if _isMRR
+	[pool drain];
+#endif
 }
 
 @implementation HIDRemoteControlDevice (IOKitMethods)
 
 - (IOHIDDeviceInterface**) createInterfaceForDevice: (io_object_t) hidDevice {
-	io_name_t				className;
-	IOCFPlugInInterface**   plugInInterface = NULL;
-	HRESULT					plugInResult = S_OK;
-	SInt32					score = 0;
-	IOReturn				ioReturnValue = kIOReturnSuccess;
+	_hidDeviceInterface = NULL;
 	
-	hidDeviceInterface = NULL;
-	
-	ioReturnValue = IOObjectGetClass(hidDevice, className);
+	io_name_t className;
+	IOReturn ioReturnValue = IOObjectGetClass(hidDevice, className);
 	
 	if (ioReturnValue != kIOReturnSuccess) {
 		NSLog(@"Error: Failed to get class name.");
 		return NULL;
 	}
 	
+	IOCFPlugInInterface** plugInInterface = NULL;
+	SInt32 score = 0;
 	ioReturnValue = IOCreatePlugInInterfaceForService(hidDevice,
 													  kIOHIDDeviceUserClientTypeID,
 													  kIOCFPlugInInterfaceID,
 													  &plugInInterface,
 													  &score);
-	if (ioReturnValue == kIOReturnSuccess)
-	{
+	if (ioReturnValue == kIOReturnSuccess) {
 		//Call a method of the intermediate plug-in to create the device interface
-		plugInResult = (*plugInInterface)->QueryInterface(plugInInterface, CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID), (LPVOID) &hidDeviceInterface);
+		HRESULT plugInResult = (*plugInInterface)->QueryInterface(plugInInterface, CFUUIDGetUUIDBytes(kIOHIDDeviceInterfaceID), (LPVOID) &_hidDeviceInterface);
 		
 		if (plugInResult != S_OK) {
 			NSLog(@"Error: Couldn't create HID class device interface");
 		}
 		// Release
-		if (plugInInterface) (*plugInInterface)->Release(plugInInterface);
+		if (plugInInterface) {
+			(*plugInInterface)->Release(plugInInterface);
+		}
 	}
-	return hidDeviceInterface;
+	return _hidDeviceInterface;
 }
 
 - (BOOL) initializeCookies {
-	IOHIDDeviceInterface122** handle = (IOHIDDeviceInterface122**)hidDeviceInterface;
-	IOHIDElementCookie		cookie;
-	//long					usage;
-	//long					usagePage;
-	id						object;
-	CFArrayRef				elements = nil;
-	NSDictionary*			element;
-	IOReturn success;
-	
-	if (!handle || !(*handle)) return NO;
+	IOHIDDeviceInterface122** handle = (IOHIDDeviceInterface122**)_hidDeviceInterface;
+	if (!handle || !(*handle)) {
+		return NO;
+	}
 	
 	// Copy all elements, since we're grabbing most of the elements
 	// for this device anyway, and thus, it's faster to iterate them
 	// ourselves. When grabbing only one or two elements, a matching
 	// dictionary should be passed in here instead of NULL.
 	
-	success = (*handle)->copyMatchingElements(handle, NULL, &elements);
+	CFArrayRef elements = NULL;
+	IOReturn success = (*handle)->copyMatchingElements(handle, NULL, &elements);
 	
-	if ( (success == kIOReturnSuccess) && elements ) {		
-		/*
-		cookies = calloc(NUMBER_OF_APPLE_REMOTE_ACTIONS, sizeof(IOHIDElementCookie)); 
-		memset(cookies, 0, sizeof(IOHIDElementCookie) * NUMBER_OF_APPLE_REMOTE_ACTIONS);
-		*/
-		allCookies = [[NSMutableArray alloc] init];
+	if ( (success == kIOReturnSuccess) && elements ) {
+		_allCookies = CFArrayCreateMutable(kCFAllocatorDefault, 0, NULL);
 		
-		NSEnumerator *elementsEnumerator = [(NSArray*)elements objectEnumerator];
-		
-		while ( (element = [elementsEnumerator nextObject]) ) {						
-			//Get cookie
-			object = [element valueForKey: @kIOHIDElementCookieKey ];
-			if (object == nil || ![object isKindOfClass:[NSNumber class]]) continue;
-			if (object == 0 || CFGetTypeID(object) != CFNumberGetTypeID()) continue;
-			cookie = (IOHIDElementCookie) [object longValue];
-			
-			//Get usage
-			object = [element valueForKey: @kIOHIDElementUsageKey ];
-			if (object == nil || ![object isKindOfClass:[NSNumber class]]) continue;			
-			//usage = [object longValue];
-			
-			//Get usage page
-			object = [element valueForKey: @kIOHIDElementUsagePageKey ];
-			if (object == nil || ![object isKindOfClass:[NSNumber class]]) continue;			
-			//usagePage = [object longValue];
-			
-			//It seems wrong to cast a cookie to a 32 bit integer since it is a void*, but in 64 bit it's actually a uint32_t!  So in both 32 and 64 bit it is 32 bit in size.
-			[allCookies addObject: [NSNumber numberWithUnsignedInt:(uint32_t)cookie]];
+		CFIndex elementsCount = CFArrayGetCount(elements);
+		if (elementsCount > 0) {
+			for (CFIndex idx = 0; idx < elementsCount; idx++) {
+				CFDictionaryRef element = CFArrayGetValueAtIndex(elements, idx);
+				
+				// Get cookie
+				CFNumberRef cookie = CFDictionaryGetValue(element, CFSTR(kIOHIDElementCookieKey));
+				if (cookie == NULL || CFGetTypeID(cookie) != CFNumberGetTypeID()) {
+					continue;
+				}
+				
+				// Get usage
+				CFNumberRef usage = CFDictionaryGetValue(element, CFSTR(kIOHIDElementUsageKey));
+				if (usage == NULL || CFGetTypeID(usage) != CFNumberGetTypeID()) {
+					continue;
+				}
+				
+				// Get usage page
+				CFNumberRef usagePage = CFDictionaryGetValue(element, CFSTR(kIOHIDElementUsagePageKey));
+				if (usagePage == NULL || CFGetTypeID(usagePage) != CFNumberGetTypeID()) {
+					continue;
+				}
+				
+				CFArrayAppendValue(_allCookies, cookie);
+			}
 		}
 		
 		CFRelease(elements);
@@ -477,33 +503,39 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 }
 
 - (BOOL) openDevice {
-	HRESULT  result;
-	
 	IOHIDOptionsType openMode = kIOHIDOptionsTypeNone;
-	if ([self isOpenInExclusiveMode]) openMode = kIOHIDOptionsTypeSeizeDevice;	
-	IOReturn ioReturnValue = (*hidDeviceInterface)->open(hidDeviceInterface, openMode);	
+	if ([self isOpenInExclusiveMode]) {
+		openMode = kIOHIDOptionsTypeSeizeDevice;
+	}
+	IOReturn ioReturnValue = (*_hidDeviceInterface)->open(_hidDeviceInterface, openMode);
 	
-	if (ioReturnValue == KERN_SUCCESS) {		
-		queue = (*hidDeviceInterface)->allocQueue(hidDeviceInterface);
-		if (queue) {
-			result = (*queue)->create(queue, 0, 12);	//depth: maximum number of elements in queue before oldest elements in queue begin to be lost.
+	if (ioReturnValue == KERN_SUCCESS) {
+		_queue = (*_hidDeviceInterface)->allocQueue(_hidDeviceInterface);
+		if (_queue) {
+			HRESULT result = (*_queue)->create(_queue, 0, 12);	//depth: maximum number of elements in queue before oldest elements in queue begin to be lost.
 			if (result == kIOReturnSuccess) {
-				IOHIDElementCookie cookie;
-				NSEnumerator *allCookiesEnumerator = [allCookies objectEnumerator];
+				CFIndex cookiesCount = CFArrayGetCount(_allCookies);
+				if (cookiesCount > 0) {
+					for (CFIndex idx = 0; idx < cookiesCount; idx++) {
+						CFNumberRef cookieRef = CFArrayGetValueAtIndex(_allCookies, idx);
+						IOHIDElementCookie cookie; // Note: this is 32 bit in both 32 & 64 bit ABIs!
+						CFNumberGetValue(cookieRef, kCFNumberSInt32Type, &cookie);
+						(*_queue)->addElement(_queue, cookie, 0);
+					}
+				}
 				
-				while ( (cookie = (IOHIDElementCookie)[[allCookiesEnumerator nextObject] unsignedIntValue]) ) {
-					(*queue)->addElement(queue, cookie, 0);
-				}			
-										  
-				// add callback for async events			
-				ioReturnValue = (*queue)->createAsyncEventSource(queue, &eventSource);			
+				// add callback for async events
+				ioReturnValue = (*_queue)->createAsyncEventSource(_queue, &_eventSource);
 				if (ioReturnValue == KERN_SUCCESS) {
-					ioReturnValue = (*queue)->setEventCallout(queue,QueueCallbackFunction, self, NULL);
+					ioReturnValue = (*_queue)->setEventCallout(_queue,
+															   QueueCallbackFunction,
+															   (_arcbridge void *)(self),
+															   NULL);
 					if (ioReturnValue == KERN_SUCCESS) {
-						CFRunLoopAddSource(CFRunLoopGetCurrent(), eventSource, kCFRunLoopDefaultMode);
+						CFRunLoopAddSource(CFRunLoopGetCurrent(), _eventSource, kCFRunLoopDefaultMode);
 						
 						//start data delivery to queue
-						(*queue)->start(queue);	
+						(*_queue)->start(_queue);
 						return YES;
 					} else {
 						NSLog(@"Error when setting event callback");
@@ -517,17 +549,21 @@ static void QueueCallbackFunction(void* target,  IOReturn result, void* refcon, 
 		} else {
 			NSLog(@"Error when opening device");
 		}
-	} else if (ioReturnValue == kIOReturnExclusiveAccess) {
+	} else if (ioReturnValue == (IOReturn)0xE00002C5 /* kIOReturnExclusiveAccess */) {
+		// Alas, the kIOReturnExclusiveAccess macro performs undefined bit shifts,
+		// as warned by -Wshift-sign-overflow. At runtime, under UBSan, this can crash
+		// so we hardcode the numeric value and cast. <rdar://12665902>
+		
 		// the device is used exclusive by another application
 		
 		// 1. we register for the FINISHED_USING_REMOTE_CONTROL_NOTIFICATION notification
 		NSDistributedNotificationCenter* defaultCenter = [NSDistributedNotificationCenter defaultCenter];
 		[defaultCenter addObserver:self selector:@selector(remoteControlAvailable:) name:FINISHED_USING_REMOTE_CONTROL_NOTIFICATION object:nil];
 		
-		// 2. send a distributed notification that we wanted to use the remote control				
+		// 2. send a distributed notification that we wanted to use the remote control
 		[[self class] sendRequestForRemoteControlNotification];
 	}
-	return NO;				
+	return NO;
 }
 
 @end

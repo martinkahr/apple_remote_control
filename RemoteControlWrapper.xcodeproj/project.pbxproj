@@ -3,11 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 42;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5B0CD7000C1FA7B700FB6330 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B0CD6FF0C1FA7B700FB6330 /* Carbon.framework */; };
+		5A2A3E9E189C83040062FC51 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A2A3E9C189C83040062FC51 /* MainMenu.xib */; };
+		5A3A8E82189330ED00771E25 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97324FDCFA39411CA2CEA /* AppKit.framework */; };
+		5A3A8E83189330F100771E25 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		5B102D700C3C04C800514E74 /* license.txt in Resources */ = {isa = PBXBuildFile; fileRef = 5B102D6F0C3C04C800514E74 /* license.txt */; };
 		5B2179AC0C09D6C5003D84DA /* AppleRemote.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF9B75709C243FD00EFA68D /* AppleRemote.m */; };
 		5B2179AD0C09D6C9003D84DA /* HIDRemoteControlDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B92775E0B78CABC0058AA16 /* HIDRemoteControlDevice.m */; };
@@ -15,14 +17,11 @@
 		5B2179B00C09D6D0003D84DA /* RemoteControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 5B9274A00B78B3B20058AA16 /* RemoteControl.m */; };
 		5B5033D6108EE854005EE1AB /* README.markdown in Resources */ = {isa = PBXBuildFile; fileRef = 5B5033D5108EE854005EE1AB /* README.markdown */; };
 		5B7B50F309C218D1009158D3 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B7B50F209C218D1009158D3 /* IOKit.framework */; };
-		5BF9B62109C2224600EFA68D /* System.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5BF9B62009C2224600EFA68D /* System.framework */; };
 		5BF9B9D809C9B00900EFA68D /* MainController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF9B9D709C9B00900EFA68D /* MainController.m */; };
 		5BF9BA8109C9BA2200EFA68D /* RemoteFeedbackView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5BF9BA8009C9BA2200EFA68D /* RemoteFeedbackView.m */; };
 		5BF9BC9509C9D23B00EFA68D /* AppleRemote.tiff in Resources */ = {isa = PBXBuildFile; fileRef = 5BF9BC9409C9D23B00EFA68D /* AppleRemote.tiff */; };
-		8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
-		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -39,14 +38,11 @@
 
 /* Begin PBXFileReference section */
 		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
-		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		29B97319FDCFA39411CA2CEA /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = English.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		5A2A3E9D189C83040062FC51 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		5B0023230C5628C400FB1521 /* RemoteControlWrapper_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = RemoteControlWrapper_Prefix.pch; sourceTree = "<group>"; };
-		5B0CD6FF0C1FA7B700FB6330 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		5B102D6F0C3C04C800514E74 /* license.txt */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text; path = license.txt; sourceTree = "<group>"; };
 		5B5033D5108EE854005EE1AB /* README.markdown */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.markdown; sourceTree = "<group>"; };
 		5B7B50F209C218D1009158D3 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
@@ -56,7 +52,6 @@
 		5B9274A00B78B3B20058AA16 /* RemoteControl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RemoteControl.m; sourceTree = "<group>"; };
 		5B92775D0B78CABC0058AA16 /* HIDRemoteControlDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HIDRemoteControlDevice.h; sourceTree = "<group>"; };
 		5B92775E0B78CABC0058AA16 /* HIDRemoteControlDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HIDRemoteControlDevice.m; sourceTree = "<group>"; };
-		5BF9B62009C2224600EFA68D /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = /System/Library/Frameworks/System.framework; sourceTree = "<absolute>"; };
 		5BF9B75609C243FD00EFA68D /* AppleRemote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleRemote.h; sourceTree = "<group>"; };
 		5BF9B75709C243FD00EFA68D /* AppleRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppleRemote.m; sourceTree = "<group>"; };
 		5BF9B9D609C9B00900EFA68D /* MainController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainController.h; sourceTree = "<group>"; };
@@ -73,10 +68,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				5B7B50F309C218D1009158D3 /* IOKit.framework in Frameworks */,
-				5BF9B62109C2224600EFA68D /* System.framework in Frameworks */,
-				5B0CD7000C1FA7B700FB6330 /* Carbon.framework in Frameworks */,
+				5A3A8E82189330ED00771E25 /* AppKit.framework in Frameworks */,
+				5A3A8E83189330F100771E25 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,24 +86,6 @@
 				5BF9BA8009C9BA2200EFA68D /* RemoteFeedbackView.m */,
 			);
 			name = "Test Client";
-			sourceTree = "<group>";
-		};
-		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
-			);
-			name = "Linked Frameworks";
-			sourceTree = "<group>";
-		};
-		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
-				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
-				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
-			);
-			name = "Other Frameworks";
 			sourceTree = "<group>";
 		};
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
@@ -150,7 +126,7 @@
 				5BF9BC9409C9D23B00EFA68D /* AppleRemote.tiff */,
 				8D1107310486CEB800E47090 /* Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
-				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
+				5A2A3E9C189C83040062FC51 /* MainMenu.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -158,11 +134,9 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				5B0CD6FF0C1FA7B700FB6330 /* Carbon.framework */,
-				5BF9B62009C2224600EFA68D /* System.framework */,
+				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
+				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
 				5B7B50F209C218D1009158D3 /* IOKit.framework */,
-				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
-				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -209,9 +183,16 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "RemoteControlWrapper" */;
-			compatibilityVersion = "Xcode 2.4";
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				en,
+			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* AppleRemote */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -226,7 +207,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D11072A0486CEB800E47090 /* MainMenu.nib in Resources */,
+				5A2A3E9E189C83040062FC51 /* MainMenu.xib in Resources */,
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				5BF9BC9509C9D23B00EFA68D /* AppleRemote.tiff in Resources */,
 				5B102D700C3C04C800514E74 /* license.txt in Resources */,
@@ -262,12 +243,12 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		29B97318FDCFA39411CA2CEA /* MainMenu.nib */ = {
+		5A2A3E9C189C83040062FC51 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				29B97319FDCFA39411CA2CEA /* English */,
+				5A2A3E9D189C83040062FC51 /* English */,
 			);
-			name = MainMenu.nib;
+			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -276,6 +257,7 @@
 		C01FCF4B08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -283,23 +265,21 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_BUNDLE_IDENTIFIER = com.martinkahr.AppleRemote;
 				PRODUCT_NAME = AppleRemote;
 				WRAPPER_EXTENSION = app;
-				ZERO_LINK = YES;
 			};
 			name = Debug;
 		};
 		C01FCF4C08A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = (
-					ppc,
-					i386,
-				);
+				COMBINE_HIDPI_IMAGES = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_MODEL_TUNING = G5;
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_BUNDLE_IDENTIFIER = com.martinkahr.AppleRemote;
 				PRODUCT_NAME = AppleRemote;
 				WRAPPER_EXTENSION = app;
 			};
@@ -308,16 +288,18 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_ENABLE_SYMBOL_SEPARATION = NO;
-				GCC_VERSION = 4.0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_FUNCTION = NO;
 				GCC_WARN_UNUSED_LABEL = YES;
 				GCC_WARN_UNUSED_PARAMETER = NO;
 				GCC_WARN_UNUSED_VALUE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 			};
 			name = Debug;
@@ -325,12 +307,10 @@
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_ENABLE_SYMBOL_SEPARATION = NO;
-				GCC_VERSION = 4.0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;

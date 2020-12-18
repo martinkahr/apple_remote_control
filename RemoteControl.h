@@ -2,10 +2,10 @@
  * RemoteControl.h
  * RemoteControlWrapper
  *
- * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
- * Copyright (c) 2006 martinkahr.com. All rights reserved.
+ * Created by Martin Kahr on 11.03.06 under a MIT-style license.
+ * Copyright (c) 2006-2014 martinkahr.com. All rights reserved.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a 
+ * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
  * to deal in the Software without restriction, including without limitation
  * the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -15,19 +15,57 @@
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
  *****************************************************************************/
- 
-#import <Cocoa/Cocoa.h>
 
-// notifaction names that are being used to signal that an application wants to 
+#import <AppKit/AppKit.h>
+
+// __has_feature is new in the 10.7 SDK, define it here if it's not yet defined.
+#ifndef __has_feature
+	#define __has_feature(x) 0
+#endif
+
+// Create handy #defines that indicate the current memory management model.
+#if defined(__OBJC_GC__)
+	#define _isMRR 0
+	#define _isGC 1
+	#define _isARC 0
+#elif __has_feature(objc_arc)
+	#define _isMRR 0
+	#define _isGC 0
+	#define _isARC 1
+#else
+	#define _isMRR 1
+	#define _isGC 0
+	#define _isARC 0
+#endif
+
+// Under GC, CF-type ivars must be explicitly strong;
+// but under ARC, doing so is not valid, and will not compile.
+#if _isGC
+	#define _gcstrong __strong
+#else
+	#define _gcstrong
+#endif
+
+// Under ARC, we sometimes need bridge casts.  Outside ARC they are not needed
+// and are not recognized by older compilers.
+#if _isARC
+	#define _arcbridge __bridge
+#else
+	#define _arcbridge
+#endif
+
+NS_ASSUME_NONNULL_BEGIN
+
+// notification names that are being used to signal that an application wants to
 // have access to the remote control device or if the application has finished
 // using the remote control device
 extern NSString* const REQUEST_FOR_REMOTE_CONTROL_NOTIFCATION;
@@ -39,11 +77,13 @@ extern NSString* const kApplicationIdentifier;
 extern NSString* const kTargetApplicationIdentifier;
 
 // we have a 6 bit offset to make a hold event out of a normal event
-#define EVENT_TO_HOLD_EVENT_OFFSET 6 
+#define EVENT_TO_HOLD_EVENT_OFFSET 6
 
 @class RemoteControl;
 
-typedef enum _RemoteControlEventIdentifier {
+typedef enum : int {
+	kRemoteButtonInvalid            = -1,
+	
 	// normal events
 	kRemoteButtonPlus				=1<<1,
 	kRemoteButtonMinus				=1<<2,
@@ -54,17 +94,17 @@ typedef enum _RemoteControlEventIdentifier {
 	
 	// hold events
 	kRemoteButtonPlus_Hold			=1<<7,
-	kRemoteButtonMinus_Hold			=1<<8,	
-	kRemoteButtonMenu_Hold			=1<<9,	
-	kRemoteButtonPlay_Hold			=1<<10,	
+	kRemoteButtonMinus_Hold			=1<<8,
+	kRemoteButtonMenu_Hold			=1<<9,
+	kRemoteButtonPlay_Hold			=1<<10,
 	kRemoteButtonRight_Hold			=1<<11,
 	kRemoteButtonLeft_Hold			=1<<12,
 	
-	// special events (not supported by all devices)	
+	// special events (not supported by all devices)
 	kRemoteControl_Switched			=1<<13,
 } RemoteControlEventIdentifier;
 
-@interface NSObject(RemoteControlDelegate)
+@protocol RemoteControlDelegate <NSObject>
 
 - (void) sendRemoteButtonEvent: (RemoteControlEventIdentifier) event pressedDown: (BOOL) pressedDown remoteControl: (RemoteControl*) remoteControl;
 
@@ -74,20 +114,25 @@ typedef enum _RemoteControlEventIdentifier {
 	Base Interface for Remote Control devices
 */
 @interface RemoteControl : NSObject {
-	id delegate;
+@private
+	id<RemoteControlDelegate> _delegate;
 }
 
+// Designated initializer
 // returns nil if the remote control device is not available
-- (id) initWithDelegate: (id) remoteControlDelegate;
+- (nullable instancetype) initWithDelegate: (nullable id<RemoteControlDelegate>) remoteControlDelegate NS_DESIGNATED_INITIALIZER;
 
-- (void) setDelegate: (id) value;
-- (id) delegate;
+#if _isMRR
+@property (readwrite, assign, nonatomic, nullable) id<RemoteControlDelegate> delegate;
+#else
+@property (readwrite, weak, nonatomic, nullable) id<RemoteControlDelegate> delegate;
+#endif
 
-- (void) setListeningToRemote: (BOOL) value;
-- (BOOL) isListeningToRemote;
+// KVO observable.
+@property (readwrite, getter=isListeningToRemote, nonatomic) BOOL listeningToRemote;
 
-- (BOOL) isOpenInExclusiveMode;
-- (void) setOpenInExclusiveMode: (BOOL) value;
+// KVO observable.
+@property (readwrite, getter=isOpenInExclusiveMode, nonatomic) BOOL openInExclusiveMode;
 
 - (IBAction) startListening: (id) sender;
 - (IBAction) stopListening: (id) sender;
@@ -96,10 +141,13 @@ typedef enum _RemoteControlEventIdentifier {
 - (BOOL) sendsEventForButtonIdentifier: (RemoteControlEventIdentifier) identifier;
 
 // sending of notifications between applications
-+ (void) sendFinishedNotifcationForAppIdentifier: (NSString*) identifier;
++ (void) sendFinishedNotifcationForAppIdentifier: (nullable NSString*) identifier;
 + (void) sendRequestForRemoteControlNotification;
 
-// name of the device
+// name of the device (corresponding to kIOClassKey)
 + (const char*) remoteControlDeviceName;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

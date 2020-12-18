@@ -3,7 +3,7 @@
  * RemoteControlWrapper
  *
  * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
- * Copyright (c) 2006 martinkahr.com. All rights reserved.
+ * Copyright (c) 2006-2014 martinkahr.com. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -15,7 +15,7 @@
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -27,48 +27,45 @@
 
 #import "MultiClickRemoteBehavior.h"
 
-const NSTimeInterval DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE=0.35;
-const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
+static const NSTimeInterval DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE=0.35;
+static const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 
 @implementation MultiClickRemoteBehavior
 
-- (id) init {
-	if (self = [super init]) {
-		maxClickTimeDifference = DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE;
+// Designated initializer
+- (instancetype) init {
+	if ((self = [super init])) {
+		_maximumClickCountTimeDifference = DEFAULT_MAXIMUM_CLICK_TIME_DIFFERENCE;
 	}
 	return self;
 }
 
-// Delegates are not retained!
-// http://developer.apple.com/documentation/Cocoa/Conceptual/CocoaFundamentals/CommunicatingWithObjects/chapter_6_section_4.html
-// Delegating objects do not (and should not) retain their delegates. 
-// However, clients of delegating objects (applications, usually) are responsible for ensuring that their delegates are around
-// to receive delegation messages. To do this, they may have to retain the delegate.
-- (void) setDelegate: (id) _delegate {
-	if (_delegate && [_delegate respondsToSelector:@selector(remoteButton:pressedDown:clickCount:)]==NO) return;
+- (void) setDelegate: (nullable id<MultiClickRemoteBehaviorDelegate>) inDelegate {
+	if (inDelegate && [inDelegate respondsToSelector:@selector(remoteButton:pressedDown:clickCount:)]==NO) {
+		return;
+	}
 	
-	delegate = _delegate;
+	_delegate = inDelegate;
 }
-- (id) delegate {
-	return delegate;
+- (nullable id<MultiClickRemoteBehaviorDelegate>) delegate {
+	return _delegate;
 }
 
-- (BOOL) simulateHoldEvent {
-	return simulateHoldEvents;
-}
-- (void) setSimulateHoldEvent: (BOOL) value {
-	simulateHoldEvents = value;
-}
+@synthesize simulateHoldEvent = _simulateHoldEvent;
 
 - (BOOL) simulatesHoldForButtonIdentifier: (RemoteControlEventIdentifier) identifier remoteControl: (RemoteControl*) remoteControl {
+	assert(remoteControl);
+	
 	// we do that check only for the normal button identifiers as we would check for hold support for hold events instead
-	if (identifier > (1 << EVENT_TO_HOLD_EVENT_OFFSET)) return NO; 
+	if (identifier > (1 << EVENT_TO_HOLD_EVENT_OFFSET)) {
+		return NO;
+	}
 	
 	return [self simulateHoldEvent] && [remoteControl sendsEventForButtonIdentifier: (identifier << EVENT_TO_HOLD_EVENT_OFFSET)]==NO;
 }
 
 - (BOOL) clickCountingEnabled {
-	return clickCountEnabledButtons != 0;
+	return _clickCountEnabledButtons != 0;
 }
 - (void) setClickCountingEnabled: (BOOL) value {
 	if (value) {
@@ -78,137 +75,138 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
 	}
 }
 
-- (unsigned int) clickCountEnabledButtons {
-	return clickCountEnabledButtons;
-}
-- (void) setClickCountEnabledButtons: (unsigned int)value {
-	clickCountEnabledButtons = value;
-}
+@synthesize clickCountEnabledButtons = _clickCountEnabledButtons;
 
-- (NSTimeInterval) maximumClickCountTimeDifference {
-	return maxClickTimeDifference;
-}
-- (void) setMaximumClickCountTimeDifference: (NSTimeInterval) timeDiff {
-	maxClickTimeDifference = timeDiff;
-}
+@synthesize maximumClickCountTimeDifference = _maximumClickCountTimeDifference;
 
 - (void) sendPressedDownEventToMainThread: (NSNumber*) event {
-	[delegate remoteButton:[event intValue] pressedDown:YES clickCount:1];
+	assert(event);
+	id<MultiClickRemoteBehaviorDelegate> strongDelegate = [self delegate];
+	[strongDelegate remoteButton:[event intValue] pressedDown:YES clickCount:1];
 }
 
-- (void) sendSimulatedHoldEvent: (id) time {
+- (void) sendSimulatedHoldEvent: (NSNumber*) time {
+	assert(time);
 	BOOL startSimulateHold = NO;
-	RemoteControlEventIdentifier event = lastHoldEvent;
+	RemoteControlEventIdentifier event = _lastHoldEvent;
 	@synchronized(self) {
-		startSimulateHold = (lastHoldEvent>0 && lastHoldEventTime == [time doubleValue]);
+		startSimulateHold = (_lastHoldEvent>0 && _lastHoldEventTime == [time doubleValue]);
 	}
 	if (startSimulateHold) {
-		lastEventSimulatedHold = YES;
+		_lastEventSimulatedHold = YES;
 		event = (event << EVENT_TO_HOLD_EVENT_OFFSET);
-		[self performSelectorOnMainThread:@selector(sendPressedDownEventToMainThread:) withObject:[NSNumber numberWithInt:event] waitUntilDone:NO];
+		[self performSelectorOnMainThread:@selector(sendPressedDownEventToMainThread:) withObject:@(event) waitUntilDone:NO];
 	}
 }
 
 - (void) executeClickCountEvent: (NSArray*) values {
-	RemoteControlEventIdentifier event = [[values objectAtIndex: 0] unsignedIntValue]; 
+	assert(values);
+	RemoteControlEventIdentifier event = [[values objectAtIndex: 0] intValue];
 	NSTimeInterval eventTimePoint = [[values objectAtIndex: 1] doubleValue];
 	
 	BOOL finishedClicking = NO;
-	int finalClickCount = eventClickCount;	
+	unsigned int finalClickCount = _eventClickCount;
 	
 	@synchronized(self) {
-		finishedClicking = (event != lastClickCountEvent || eventTimePoint == lastClickCountEventTime);
+		finishedClicking = (event != _lastClickCountEvent || eventTimePoint == _lastClickCountEventTime);
 		if (finishedClicking) {
-			eventClickCount = 0;		
-			lastClickCountEvent = 0;
-			lastClickCountEventTime = 0;
+			_eventClickCount = 0;
+			_lastClickCountEvent = 0;
+			_lastClickCountEventTime = 0;
 		}
 	}
 	
-	if (finishedClicking) {	
-		[delegate remoteButton:event pressedDown: YES clickCount:finalClickCount];		
+	if (finishedClicking) {
+		id<MultiClickRemoteBehaviorDelegate> strongDelegate = [self delegate];
+		[strongDelegate remoteButton:event pressedDown: YES clickCount:finalClickCount];
 		// trigger a button release event, too
 		[NSThread sleepUntilDate: [NSDate dateWithTimeIntervalSinceNow:0.1]];
-		[delegate remoteButton:event pressedDown: NO clickCount:finalClickCount];
+		[strongDelegate remoteButton:event pressedDown: NO clickCount:finalClickCount];
 	}
 }
 
-- (void) sendRemoteButtonEvent: (RemoteControlEventIdentifier) event pressedDown: (BOOL) pressedDown remoteControl: (RemoteControl*) remoteControl {	
-	if (!delegate)  return;
+- (void) sendRemoteButtonEvent: (RemoteControlEventIdentifier) event pressedDown: (BOOL) pressedDown remoteControl: (RemoteControl*) remoteControl {
+	assert(remoteControl);
+	
+	id<MultiClickRemoteBehaviorDelegate> strongDelegate = [self delegate];
+	if (!strongDelegate) {
+		return;
+	}
 	
 	BOOL clickCountingForEvent = ([self clickCountEnabledButtons] & event) == event;
 
-	if ([self simulatesHoldForButtonIdentifier: event remoteControl: remoteControl] && lastClickCountEvent==0) {
+	if ([self simulatesHoldForButtonIdentifier: event remoteControl: remoteControl] && _lastClickCountEvent==0) {
 		if (pressedDown) {
 			// wait to see if it is a hold
-			lastHoldEvent = event;
-			lastHoldEventTime = [NSDate timeIntervalSinceReferenceDate];
+			_lastHoldEvent = event;
+			_lastHoldEventTime = [NSDate timeIntervalSinceReferenceDate];
 			[self performSelector:@selector(sendSimulatedHoldEvent:) 
-					   withObject:[NSNumber numberWithDouble:lastHoldEventTime]
+					   withObject:@(_lastHoldEventTime)
 					   afterDelay:HOLD_RECOGNITION_TIME_INTERVAL];
 			return;
 		} else {
-			if (lastEventSimulatedHold) {
+			if (_lastEventSimulatedHold) {
 				// it was a hold
 				// send an event for "hold release"
 				event = (event << EVENT_TO_HOLD_EVENT_OFFSET);
-				lastHoldEvent = 0;
-				lastEventSimulatedHold = NO;
+				_lastHoldEvent = 0;
+				_lastEventSimulatedHold = NO;
 
-				[delegate remoteButton:event pressedDown: pressedDown clickCount:1];
+				[strongDelegate remoteButton:event pressedDown: pressedDown clickCount:1];
 				return;
 			} else {
-				RemoteControlEventIdentifier previousEvent = lastHoldEvent;
+				RemoteControlEventIdentifier previousEvent = _lastHoldEvent;
 				@synchronized(self) {
-					lastHoldEvent = 0;
-				}						
+					_lastHoldEvent = 0;
+				}
 				
 				// in case click counting is enabled we have to setup the state for that, too
 				if (clickCountingForEvent) {
-					lastClickCountEvent = previousEvent;
-					lastClickCountEventTime = lastHoldEventTime;
+					_lastClickCountEvent = previousEvent;
+					_lastClickCountEventTime = _lastHoldEventTime;
 					NSNumber* eventNumber;
-					NSNumber* timeNumber;		
-					eventClickCount = 1;
-					timeNumber = [NSNumber numberWithDouble:lastClickCountEventTime];
-					eventNumber= [NSNumber numberWithUnsignedInt:previousEvent];
-					NSTimeInterval diffTime = maxClickTimeDifference-([NSDate timeIntervalSinceReferenceDate]-lastHoldEventTime);
+					NSNumber* timeNumber;
+					_eventClickCount = 1;
+					timeNumber = @(_lastClickCountEventTime);
+					eventNumber= @(previousEvent);
+					NSTimeInterval diffTime = _maximumClickCountTimeDifference-([NSDate timeIntervalSinceReferenceDate]-_lastHoldEventTime);
 					[self performSelector: @selector(executeClickCountEvent:) 
-							   withObject: [NSArray arrayWithObjects:eventNumber, timeNumber, nil]
-							   afterDelay: diffTime];							
+							   withObject: @[eventNumber, timeNumber]
+							   afterDelay: diffTime];
 					// we do not return here because we are still in the press-release event
 					// that will be consumed below
 				} else {
 					// trigger the pressed down event that we consumed first
-					[delegate remoteButton:event pressedDown: YES clickCount:1];							
+					[strongDelegate remoteButton:event pressedDown: YES clickCount:1];
 				}
-			}										
+			}
 		}
 	}
 	
 	if (clickCountingForEvent) {
-		if (pressedDown == NO) return;
+		if (pressedDown == NO) {
+			return;
+		}
 
 		NSNumber* eventNumber;
 		NSNumber* timeNumber;
 		@synchronized(self) {
-			lastClickCountEventTime = [NSDate timeIntervalSinceReferenceDate];
-			if (lastClickCountEvent == event) {
-				eventClickCount = eventClickCount + 1;
+			_lastClickCountEventTime = [NSDate timeIntervalSinceReferenceDate];
+			if (_lastClickCountEvent == event) {
+				_eventClickCount = _eventClickCount + 1;
 			} else {
-				eventClickCount = 1;
+				_eventClickCount = 1;
 			}
-			lastClickCountEvent = event;
-			timeNumber = [NSNumber numberWithDouble:lastClickCountEventTime];
-			eventNumber= [NSNumber numberWithUnsignedInt:event];
+			_lastClickCountEvent = event;
+			timeNumber = @(_lastClickCountEventTime);
+			eventNumber= @(event);
 		}
-		[self performSelector: @selector(executeClickCountEvent:) 
-				   withObject: [NSArray arrayWithObjects:eventNumber, timeNumber, nil]
-				   afterDelay: maxClickTimeDifference];
+		[self performSelector: @selector(executeClickCountEvent:)
+				   withObject: @[eventNumber, timeNumber]
+				   afterDelay: _maximumClickCountTimeDifference];
 	} else {
-		[delegate remoteButton:event pressedDown: pressedDown clickCount:1];
-	}		
-
+		[strongDelegate remoteButton:event pressedDown: pressedDown clickCount:1];
+	}
 }
 
 @end

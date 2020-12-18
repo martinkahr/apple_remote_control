@@ -3,7 +3,7 @@
  * RemoteControlWrapper
  *
  * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
- * Copyright (c) 2006 martinkahr.com. All rights reserved.
+ * Copyright (c) 2006-2014 martinkahr.com. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -15,7 +15,7 @@
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -26,41 +26,56 @@
  *****************************************************************************/
 
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 #import "RemoteControl.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+/*
+ * Method definitions for the delegate of the MultiClickRemoteBehavior class
+ */
+@protocol MultiClickRemoteBehaviorDelegate <NSObject>
+
+@required
+- (void) remoteButton: (RemoteControlEventIdentifier)buttonIdentifier pressedDown: (BOOL) pressedDown clickCount: (unsigned int) count;
+
+@end
 
 /**
 	A behavior that adds multiclick and hold events on top of a device.
 	Events are generated and send to a delegate
  */
-@interface MultiClickRemoteBehavior : NSObject {
-	id delegate;
+@interface MultiClickRemoteBehavior : NSObject <RemoteControlDelegate> {
+@private
+	id<MultiClickRemoteBehaviorDelegate> _delegate;
 	
 	// state for simulating plus/minus hold
-	BOOL simulateHoldEvents;	
-	BOOL lastEventSimulatedHold;
-	RemoteControlEventIdentifier lastHoldEvent;
-	NSTimeInterval lastHoldEventTime;	
+	BOOL _simulateHoldEvent;
+	BOOL _lastEventSimulatedHold;
+	RemoteControlEventIdentifier _lastHoldEvent;
+	NSTimeInterval _lastHoldEventTime;
 	
 	// state for multi click
-	unsigned int clickCountEnabledButtons;
-	NSTimeInterval maxClickTimeDifference;
-	NSTimeInterval lastClickCountEventTime;	
-	RemoteControlEventIdentifier lastClickCountEvent;
-	unsigned int eventClickCount;	
+	RemoteControlEventIdentifier _clickCountEnabledButtons;
+	NSTimeInterval _maximumClickCountTimeDifference;
+	NSTimeInterval _lastClickCountEventTime;
+	RemoteControlEventIdentifier _lastClickCountEvent;
+	unsigned int _eventClickCount;
 }
 
-- (id) init;
+// Designated initializer
+- (instancetype) init NS_DESIGNATED_INITIALIZER;
 
-// Delegates are not retained
-- (void) setDelegate: (id) delegate;
-- (id) delegate;
+#if _isMRR
+@property (readwrite, assign, nonatomic, nullable) id<MultiClickRemoteBehaviorDelegate> delegate;
+#else
+@property (readwrite, weak, nonatomic, nullable) id<MultiClickRemoteBehaviorDelegate> delegate;
+#endif
 
 // Simulating hold events does deactivate sending of individual requests for pressed down/released.
 // Instead special hold events are being triggered when the user is pressing and holding a button for a small period.
 // Simulation is activated only for those buttons and remote control that do not have a seperate event already
-- (BOOL) simulateHoldEvent;
-- (void) setSimulateHoldEvent: (BOOL) value;
+@property (readwrite, nonatomic) BOOL simulateHoldEvent;
 
 // click counting makes it possible to recognize if the user has pressed a button repeatedly
 // click counting does delay each event as it has to wait if there is another event (second click)
@@ -68,23 +83,14 @@
 // of the user and the call of your delegate method
 // click counting can be enabled individually for specific buttons. Use the property clickCountEnableButtons to
 // set the buttons for which click counting shall be enabled
-- (BOOL) clickCountingEnabled;
-- (void) setClickCountingEnabled: (BOOL) value;
+@property (readwrite, nonatomic) BOOL clickCountingEnabled;
 
-- (unsigned int) clickCountEnabledButtons;
-- (void) setClickCountEnabledButtons: (unsigned int)value;
+@property (readwrite, nonatomic) RemoteControlEventIdentifier clickCountEnabledButtons;
 
 // the maximum time difference till which clicks are recognized as multi clicks
-- (NSTimeInterval) maximumClickCountTimeDifference;
-- (void) setMaximumClickCountTimeDifference: (NSTimeInterval) timeDiff;
+@property (readwrite, nonatomic) NSTimeInterval maximumClickCountTimeDifference;
 
 @end
 
-/* 
- * Method definitions for the delegate of the MultiClickRemoteBehavior class
- */
-@interface NSObject(MultiClickRemoteBehaviorDelegate)
+NS_ASSUME_NONNULL_END
 
-- (void) remoteButton: (RemoteControlEventIdentifier)buttonIdentifier pressedDown: (BOOL) pressedDown clickCount: (unsigned int) count;
-
-@end

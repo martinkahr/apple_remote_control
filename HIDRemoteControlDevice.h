@@ -3,7 +3,7 @@
  * RemoteControlWrapper
  *
  * Created by Martin Kahr on 11.03.06 under a MIT-style license. 
- * Copyright (c) 2006 martinkahr.com. All rights reserved.
+ * Copyright (c) 2006-2014 martinkahr.com. All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"),
@@ -15,7 +15,7 @@
  * The above copyright notice and this permission notice shall be included
  * in all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED ‚ÄúAS IS‚Äù, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
  * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -25,34 +25,36 @@
  *
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 #import <IOKit/hid/IOHIDLib.h>
 
 #import "RemoteControl.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 /*
 	Base class for HID based remote control devices
  */
 @interface HIDRemoteControlDevice : RemoteControl {
-	IOHIDDeviceInterface** hidDeviceInterface;
-	IOHIDQueueInterface**  queue;
-	NSMutableArray*		   allCookies;
-	NSMutableDictionary*   cookieToButtonMapping;
+@private
+	IOHIDDeviceInterface** _hidDeviceInterface;
+	IOHIDQueueInterface**  _queue;
+	_gcstrong CFMutableArrayRef	   _allCookies;
+	NSMutableDictionary*   _cookieToButtonMapping;
 	
-	__strong CFRunLoopSourceRef	   eventSource;
+	_gcstrong CFRunLoopSourceRef	   _eventSource;
 	
-	BOOL openInExclusiveMode;
-	BOOL processesBacklog;	
+	BOOL _openInExclusiveMode;
+	BOOL _processesBacklog;
 	
-	int supportedButtonEvents;
+	int _supportedButtonEvents;
 }
 
-// When your application needs to much time on the main thread when processing an event other events
+// When your application needs too much time on the main thread when processing an event other events
 // may already be received which are put on a backlog. As soon as your main thread
 // has some spare time this backlog is processed and may flood your delegate with calls.
 // Backlog processing is turned off by default.
-- (BOOL) processesBacklog;
-- (void) setProcessesBacklog: (BOOL) value;
+@property (readwrite, nonatomic) BOOL processesBacklog;
 
 // methods that should be overridden by subclasses
 - (void) setCookieMappingInDictionary: (NSMutableDictionary*) cookieToButtonMapping;
@@ -65,7 +67,12 @@
 - (void) openRemoteControlDevice;
 - (void) closeRemoteControlDevice: (BOOL) shallSendNotifications;
 
+// You must call IOObjectRelease() on the returned value when you are done with it.
 + (io_object_t) findRemoteDevice;
+
 + (BOOL) isRemoteAvailable;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

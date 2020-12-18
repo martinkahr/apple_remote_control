@@ -3,24 +3,31 @@
 //  RemoteControlWrapper
 //
 //  Created by Martin Kahr on 16.03.06.
-//  Copyright 2006 martinkahr.com. All rights reserved.
+//  Copyright 2006-2014 martinkahr.com. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
-@class RemoteControl;
-@class MultiClickRemoteBehavior;
+#include "MultiClickRemoteBehavior.h"
 
-@interface MainController : NSObject {
-	RemoteControl* remoteControl;
-	MultiClickRemoteBehavior* remoteBehavior;
+NS_ASSUME_NONNULL_BEGIN
+
+@class RemoteFeedbackView;
+
+@interface MainController : NSObject <MultiClickRemoteBehaviorDelegate> {
+@private
+	RemoteControl* _remoteControl;
+	MultiClickRemoteBehavior* _remoteBehavior;
 	
-	IBOutlet NSView*		feedbackView;
+	IBOutlet RemoteFeedbackView*		feedbackView;
 	IBOutlet NSTextField*	feedbackText;
 }
 
-- (RemoteControl*) remoteControl;
-- (void) setRemoteControl: (RemoteControl*) newControl;
+@property (readwrite, retain, nonatomic, nullable) RemoteControl* remoteControl;
 
+@property (readwrite, retain, nonatomic) MultiClickRemoteBehavior* remoteBehavior;
 
 @end
+
+NS_ASSUME_NONNULL_END
+
